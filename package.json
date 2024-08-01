@@ -1,0 +1,24 @@
+{
+  "name": "rag-llms-investigation",
+  "type": "module",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^0.2.22",
+    "@langchain/ollama": "^0.0.2",
+    "@langchain/openai": "^0.2.5",
+    "cheerio": "^1.0.0-rc.12",
+    "langchain": "^0.2.12",
+    "readline-sync": "^1.4.10",
+    "unstructured-client": "^0.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

@@ -1,0 +1,321 @@
+[
+  {
+    "type": "Title",
+    "element_id": "79ada6ff69290673eda9b61f773ddb93",
+    "text": "Contributing Guide",
+    "metadata": {
+      "category_depth": 0,
+      "languages": [
+        "eng"
+      ],
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "fe44ff65adecec2f93c9d0111de3dc1b",
+    "text": "If you want to change something please use power of pull-request and issue tracker",
+    "metadata": {
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "79ada6ff69290673eda9b61f773ddb93",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "d3a98e817d3e9d423dc699f0af01ba6b",
+    "text": "Table Of Contents",
+    "metadata": {
+      "category_depth": 1,
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "79ada6ff69290673eda9b61f773ddb93",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "1ebb702a92b3cdc5ec67d68729a2f77e",
+    "text": "How to contribute",
+    "metadata": {
+      "category_depth": 1,
+      "link_texts": [
+        "How to contribute"
+      ],
+      "link_urls": [
+        "#how-to-contribute"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "d3a98e817d3e9d423dc699f0af01ba6b",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "1d63b140aa5099c7860c24ac51ed4c1b",
+    "text": "Types of issues",
+    "metadata": {
+      "category_depth": 1,
+      "link_texts": [
+        "Types of issues"
+      ],
+      "link_urls": [
+        "#types-of-issues"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "d3a98e817d3e9d423dc699f0af01ba6b",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+    "text": "How to contribute",
+    "metadata": {
+      "category_depth": 1,
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "79ada6ff69290673eda9b61f773ddb93",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "56a37e40c183d21d15786b07c0d1e53d",
+    "text": "Make sure you have SSL configured on your working machine as well as in your gitlab account.",
+    "metadata": {
+      "link_texts": [
+        "SSL configured"
+      ],
+      "link_urls": [
+        "https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "6f82a104e34a12fbcb51522236cde2c9",
+    "text": "Create a fork version of the matrix repo (click Fork button on the right side of the repo name's row).",
+    "metadata": {
+      "emphasized_text_contents": [
+        "Fork"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "16887b421bfa6a878ed40a6db38f98a6",
+    "text": "Clone the project forked: git clone git@gitlab2.eleks-software.local:<firstname.lastname>/javascript-matrix.git",
+    "metadata": {
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "1f625184790afcce4ce04b5fa7f0d373",
+    "text": "Create branch: git checkout -b <your-branch-name>",
+    "metadata": {
+      "category_depth": 1,
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "6d9f5a6822f23efba753698eec98beed",
+    "text": "Add, commit changes and push them by: git push --set-upstream --progress origin <your-branch-name>",
+    "metadata": {
+      "category_depth": 1,
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "746e4d414b6a5fa66b9c8d7be294a946",
+    "text": "Click Create merge request button appeared on top of the page.",
+    "metadata": {
+      "emphasized_text_contents": [
+        "Create merge request"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "1a52f708faa892f6eb82d5d5cbe0e8c6",
+    "text": "Create a Merge Request into the master branch of main repository with a clear title and description.",
+    "metadata": {
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "fe9380a8e577a0b5d571df9c5ac6f37d",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "69ce0f714f3deec7f24a10376a31e303",
+    "text": "Types of issues",
+    "metadata": {
+      "category_depth": 1,
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "79ada6ff69290673eda9b61f773ddb93",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "ca48da65368221c4e2b4c3bc07e59ac4",
+    "text": "bug - please submit if you found some kinds of typos, broken links, duplicates, etc",
+    "metadata": {
+      "category_depth": 1,
+      "emphasized_text_contents": [
+        "bug"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "69ce0f714f3deec7f24a10376a31e303",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "6b32794d6993b26c334ae86935a990f8",
+    "text": "improvement - please submit if you want add something new to matrix. For example: section, question, recommendation links, etc.",
+    "metadata": {
+      "category_depth": 1,
+      "emphasized_text_contents": [
+        "improvement"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "69ce0f714f3deec7f24a10376a31e303",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "359a33727074ceaba7dff1eef9151f2c",
+    "text": "change-request - please submit if you think that some matrix questions are not relevant to our stream",
+    "metadata": {
+      "category_depth": 1,
+      "emphasized_text_contents": [
+        "change-request"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "69ce0f714f3deec7f24a10376a31e303",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "e25e49a6b9ce17f3dd487048a9138a51",
+    "text": "deprecation - please submit if you are think that some matrix question are not up to date",
+    "metadata": {
+      "category_depth": 1,
+      "emphasized_text_contents": [
+        "deprecation"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "69ce0f714f3deec7f24a10376a31e303",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "8a849bbb0da1075ed144454873e09748",
+    "text": "question - please submit if you have question about some matrix section",
+    "metadata": {
+      "category_depth": 1,
+      "emphasized_text_contents": [
+        "question"
+      ],
+      "emphasized_text_tags": [
+        "b"
+      ],
+      "languages": [
+        "eng"
+      ],
+      "parent_id": "69ce0f714f3deec7f24a10376a31e303",
+      "filename": "main.md",
+      "filetype": "text/markdown"
+    }
+  }
+]
