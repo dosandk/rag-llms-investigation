@@ -2,7 +2,7 @@ import 'dotenv/config'
 import "cheerio";
 import { join } from "node:path";
 
-import { UnstructuredLoader, UnstructuredDirectoryLoader } from "@langchain/community/document_loaders/fs/unstructured";
+import { UnstructuredDirectoryLoader } from "@langchain/community/document_loaders/fs/unstructured";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
@@ -16,10 +16,6 @@ const options = {
   apiKey: `${process.env.UNSTRUCTURED_API_KEY}`,
 };
 
-// const loader = new UnstructuredLoader(
-//   join(import.meta.dirname, '/docs/main.md'),
-//   options,
-// );
 const loader = new UnstructuredDirectoryLoader(
   join(import.meta.dirname, '/docs'),
   options
@@ -33,10 +29,10 @@ const textSplitter = new RecursiveCharacterTextSplitter({
 const splits = await textSplitter.splitDocuments(docs);
 const openAIEmbeddings = new OpenAIEmbeddings();
 
-// const vectorStore = await Chroma.fromDocuments(splits, openAIEmbeddings, { collectionName: "test-collection" });
-const vectorStore = new Chroma(openAIEmbeddings, { collectionName: "test-collection" });
-const ids = await vectorStore.addDocuments(splits);
-console.log('ids', ids, ids.length)
+const vectorStore = await Chroma.fromDocuments(splits, openAIEmbeddings, { collectionName: "test-collection" });
+// const vectorStore = new Chroma(openAIEmbeddings, { collectionName: "test-collection" });
+// const ids = await vectorStore.addDocuments(splits);
+// console.log('ids', ids, ids.length)
 
 
 // Retrieve and generate using the relevant snippets of the blog.
@@ -53,19 +49,11 @@ const ragChain = await createStuffDocumentsChain({
 
 
 startConversation(async (question = "") => {
-  const response = await vectorStore.similaritySearch("what is the ideal Use Case for Hybrid apps?", 5);
+  const context = await vectorStore.similaritySearch(question, 5);
 
-  console.log('---------------------------------------------')
-  console.log('ChromaDB search results', response);
+  console.log('-------------------- Context -------------------------', context.map(el => el.pageContent))
 
-  // const context = await retriever.invoke(question)
+  const result = await ragChain.invoke({ context, question });
 
-  // console.log("final context", context.map(el => el.pageContent))
-  // const result = await ragChain.invoke({
-  //   // TODO: what is this?
-  //   context: await retriever.invoke(question),
-  //   question: question,
-  // });
-
-  // console.log("result", result);
+  console.log("result", result);
 });
