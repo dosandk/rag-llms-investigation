@@ -5,12 +5,20 @@ import { join } from "node:path";
 import { UnstructuredDirectoryLoader } from "@langchain/community/document_loaders/fs/unstructured";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
+import { ChromaClient } from 'chromadb'
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 
 import { pull } from "langchain/hub";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import startConversation from "./start-conversation.js";
+
+const COLLECTION_NAME = "test-collection"
+
+const clearDB = async () => {
+  const client = new ChromaClient();
+  await client.deleteCollection({ name: COLLECTION_NAME })
+}
 
 const options = {
   apiKey: `${process.env.UNSTRUCTURED_API_KEY}`,
@@ -29,8 +37,11 @@ const textSplitter = new RecursiveCharacterTextSplitter({
 const splits = await textSplitter.splitDocuments(docs);
 const openAIEmbeddings = new OpenAIEmbeddings();
 
-const vectorStore = await Chroma.fromDocuments(splits, openAIEmbeddings, { collectionName: "test-collection" });
-// const vectorStore = new Chroma(openAIEmbeddings, { collectionName: "test-collection" });
+// clear database
+await clearDB();
+// fill DB with data
+const vectorStore = await Chroma.fromDocuments(splits, openAIEmbeddings, { collectionName: COLLECTION_NAME });
+// const vectorStore = new Chroma(openAIEmbeddings, { collectionName: COLLECTION_NAME });
 // const ids = await vectorStore.addDocuments(splits);
 // console.log('ids', ids, ids.length)
 
