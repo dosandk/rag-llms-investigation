@@ -17,11 +17,11 @@ import { MemoryVectorStore } from "langchain/vectorstores/memory";
 // load documets as strings
 import { readdir, readFile } from "node:fs/promises";
 
-const DATA_DIR = join(import.meta.dirname, "/docs");
+const DATA_DIR = join(import.meta.dirname, "../docs");
 const docs = [];
 
 try {
-  for (const fileName of await readdir(join(import.meta.dirname, "/docs"))) {
+  for (const fileName of await readdir(join(import.meta.dirname, "../docs"))) {
     let data = await readFile(join(DATA_DIR, `/${fileName}`), "utf8");
     docs.push(`${data}`);
   }
@@ -29,12 +29,16 @@ try {
   console.error(err);
 }
 
+console.log("docs", docs);
+
 const textSplitter = new RecursiveCharacterTextSplitter({
   chunkSize: 500,
   chunkOverlap: 100,
 });
 
 const splits = await textSplitter.createDocuments(docs);
+
+// console.log("splits", splits);
 
 const openAIEmbeddings = new OpenAIEmbeddings();
 
