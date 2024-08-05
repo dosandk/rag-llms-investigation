@@ -7,6 +7,7 @@ import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
 import { ChatOllama } from "@langchain/ollama";
 
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { pull } from "langchain/hub";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { PromptTemplate } from "@langchain/core/prompts";
@@ -19,6 +20,8 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 
 import startConversation from "./start-conversation.js";
+import { Chroma } from "@langchain/community/vectorstores/chroma";
+import "chromadb";
 
 const options = {
   apiKey: `${process.env.UNSTRUCTURED_API_KEY}`,
@@ -40,15 +43,31 @@ const embeddings = new OllamaEmbeddings({
   model: "llama3", // default value
   baseUrl: "http://localhost:11434", // default value
 });
+const openAIEmbeddings = new OpenAIEmbeddings();
 
-const vectorStore = await MemoryVectorStore.fromDocuments(splits, embeddings);
+// const vectorStore = await MemoryVectorStore.fromDocuments(
+//   splits,
+//   embeddings,
+//   // openAIEmbeddings,
+// );
+
+const vectorStore = await Chroma.fromDocuments(docs, new OpenAIEmbeddings(), {
+  collectionName: "test-collection",
+  url: "http://localhost:8000", // Optional, will default to this value
+  collectionMetadata: {
+    "hnsw:space": "cosine",
+  }, // Optional, can be used to specify the distance method of the embedding space https://docs.trychroma.com/usage-guide#changing-the-distance-function
+});
 
 // Retrieve and generate using the relevant snippets of the blog.
 const retriever = vectorStore.asRetriever();
+
+console.log(retriever);
+
 const foo = await pull("rlm/rag-prompt");
 
-console.log("prev prompt", foo);
-console.log(foo.promptMessages.map((msg) => msg.prompt.template).join("\n"));  
+// console.log("prev prompt", foo);
+// console.log(foo.promptMessages.map((msg) => msg.prompt.template).join("\n"));
 
 const template = `
 You are an assistant for question-answering tasks. 
@@ -80,7 +99,10 @@ const ragChain = await createStuffDocumentsChain({
 const getContext = async (question = "") => {
   const result = await retriever.invoke(question);
 
-  console.log("context", result);
+  console.log(
+    "context",
+    result.map((el) => el.pageContent),
+  );
 
   return result;
 };
