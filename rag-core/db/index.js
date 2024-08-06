@@ -55,10 +55,6 @@ export default class DB {
     return collection;
   }
 
-  store = {
-    collectionName: "embeddings",
-  };
-
   // TODO: maybe move this to separate abstraction...
   async createVectorStore({ splits, embeddings, collectionName } = {}) {
     const vectorStore = await Chroma.fromDocuments(splits, embeddings, {

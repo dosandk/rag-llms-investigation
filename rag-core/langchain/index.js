@@ -17,6 +17,7 @@ Context: {context}
 Answer:
 `;
 
+// TODO: add chat history <https://js.langchain.com/v0.2/docs/how_to/message_history/>
 const getRagChain = async () => {
   // TODO: get this from env variables
   const collectionName = "test-collection";

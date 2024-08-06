@@ -13,7 +13,9 @@ const startConversation = (callback) => {
       return;
     }
 
-    await callback(userQuestion);
+    const result = await callback(userQuestion);
+
+    console.log("Answer: ", result);
 
     proposePrompt();
   };
