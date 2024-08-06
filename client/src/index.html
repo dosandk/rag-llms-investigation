@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>RAG experiments</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="index.js"></script>
+</head>
+
+<body>
+  <h1>Hello for RAG (Retrieval Augmented Generation)</h1>
+
+  <div>
+    <!-- NOTE: investigate difference between usage "create" and "Create" in question  -->
+    <input id="questionInput" size="60" type="text" value="how to Create a fork version of the matrix repo" />
+  </div>
+  <br />
+  <button id="sendBtn">Send</button>
+  <button id="resetBtn">Reset</button>
+  <br />
+
+  <div id="root"></div>
+</body>
+
+</html>
