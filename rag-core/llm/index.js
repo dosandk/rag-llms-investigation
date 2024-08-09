@@ -8,6 +8,8 @@ export const llm = new ChatOllama({
   // TODO: set baseUrl via env variable
   baseUrl: "http://localhost:11434",
   model: "llama3",
+  // TODO: set via env variables
+  temperature: 0.9,
 });
 
 export const embeddings = new OllamaEmbeddings({

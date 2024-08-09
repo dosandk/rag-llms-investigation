@@ -1,50 +1,10 @@
-import readlineSync from "readline-sync";
+import getRagChain from "../langchain/index.js";
+import start from "./src/app.js";
 
-// TODO: need for tests...
-const startConversation = (callback) => {
-  console.log("Welcome to chat with AI!");
-  console.log("Type your question: ");
+try {
+  const { ragChain, retriever } = await getRagChain();
 
-  const proposePrompt = async () => {
-    const userQuestion = readlineSync.question("Question: ");
-
-    if (userQuestion === "/exit") {
-      console.log("exit");
-      return;
-    }
-
-    const result = await callback(userQuestion);
-
-    console.log("Answer: ", result);
-
-    proposePrompt();
-  };
-
-  proposePrompt();
-};
-
-class Chat {
-  constructor(ragChain, retriever) {
-    this.ragChain = ragChain;
-    this.retriever = retriever;
-  }
-
-  ask = async (question = "") => {
-    const context = await this.retriever.invoke(question);
-
-    const result = await this.ragChain.invoke({
-      context,
-      question,
-    });
-
-    return result;
-  };
+  start(ragChain, retriever);
+} catch (error) {
+  console.log("RAG App Error:", error.message);
 }
-
-const start = (ragChain, retriever) => {
-  const chat = new Chat(ragChain, retriever);
-
-  startConversation(chat.ask);
-};
-
-export default start;

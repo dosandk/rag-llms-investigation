@@ -1,11 +1,17 @@
 import { join } from "node:path";
+import { writeFileSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import {
+  RecursiveCharacterTextSplitter,
+  MarkdownTextSplitter,
+} from "@langchain/textsplitters";
 
 // TODO: change to Lama embedings
 import { db } from "../db/index.js";
 import { embeddings } from "../llm/index.js";
+
+import { UnstructuredDirectoryLoader } from "@langchain/community/document_loaders/fs/unstructured";
 
 const getDocsContent = async () => {
   const DATA_DIR = join(import.meta.dirname, "../docs");
@@ -23,17 +29,37 @@ const getDocsContent = async () => {
   }
 };
 
+// NOTE: Unstructured loader
+// const options = {
+//   apiKey: `${process.env.UNSTRUCTURED_API_KEY}`,
+// };
+
+// const loader = new UnstructuredDirectoryLoader(
+//   join(import.meta.dirname, "../docs"),
+//   options,
+// );
+
 const run = async () => {
   const rawDocs = await getDocsContent();
+  // NOTE: Unstructured loader
+  // const rawDocs = await loader.load();
 
-  const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 100,
+  const textSplitter = new MarkdownTextSplitter({
+    chunkSize: 300,
+    chunkOverlap: 20,
   });
 
   const splits = await textSplitter.createDocuments(rawDocs);
+  // NOTE: use it only with UnstructuredLoader
+  // const splits = await textSplitter.splitDocuments(rawDocs);
 
-  console.log("splits", splits);
+  try {
+    writeFileSync("./splits.json", JSON.stringify(splits), {
+      encoding: "utf8",
+    });
+  } catch (error) {
+    console.log(error);
+  }
 
   try {
     await db.resetDb();

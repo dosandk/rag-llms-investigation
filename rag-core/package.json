@@ -7,8 +7,8 @@
   "scripts": {
     "parse-docs": "node ./docs-parser/index.js",
     "remove-db": "rimraf ./chroma-data ./chroma.log",
-    "start:cli": "nodemon ./cli/index.js",
-    "start:server": "nodemon ./server/index.js",
+    "start:cli": "node ./cli/index.js",
+    "start:server": "nodemon --inspect ./server/index.js",
     "deploy": ""
   },
   "author": "",

@@ -3,9 +3,7 @@ const questionInput = document.getElementById("questionInput");
 const sendBtn = document.getElementById("sendBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-const BACKEND_URL = "http://localhost:9002/chat";
-
-// const question = "how to Create a fork version of the matrix repo";
+const BACKEND_URL = "http://localhost:9002/chat-with-stream";
 
 const abortController = new AbortController();
 
@@ -31,10 +29,18 @@ const getData = async (question = "", callback) => {
       return;
     }
 
-    const chunk = decoder.decode(value);
+    const chunk = decoder.decode(value, { stream: true });
+    const arr = chunk.split("\n\t\t\t\n");
 
-    console.log("chunk", chunk);
-    callback(chunk);
+    for (const item of arr) {
+      if (!item) continue;
+
+      const json = JSON.parse(item);
+
+      if (json.answer) {
+        callback(json.answer);
+      }
+    }
 
     read();
   };
@@ -48,8 +54,13 @@ sendBtn.addEventListener("click", () => {
 
     console.log("question", question);
 
+    const questionWrapper = document.createElement("div");
+
+    questionWrapper.classList.add("wrapper");
+    root.append(questionWrapper);
+
     getData(question, (chunk = "") => {
-      root.append(chunk);
+      questionWrapper.append(chunk);
     });
   } catch (error) {
     console.log("Error getting chat data", error);
