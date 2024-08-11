@@ -1,0 +1,30 @@
+html,
+body {
+  height: 100%;
+  font-size: 1rem;
+}
+
+body {
+  margin: 0;
+  background-color: #f9f9f9;
+  font-family: "Montserrat", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+#root,
+#main-layout {
+  height: 100%;
+  width: 100%;
+}
+
+@import "./bootstrap.scss";
+@import "bootstrap-icons/font/bootstrap-icons.css";

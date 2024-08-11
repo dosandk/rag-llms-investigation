@@ -1,0 +1,27 @@
+.modal-dialog {
+  width: 90svw;
+  max-width: none;
+  height: 90svh;
+  margin: 0.5rem auto 0 auto;
+}
+
+.modal-header {
+  padding: 0.5rem;
+  height: 2rem;
+  position: relative;
+  z-index: 100;
+}
+
+.modal-content {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-component {
+  width: 100%;
+  height: calc(100% - 2rem);
+  overflow: auto;
+  text-align: center;
+  padding-top: 0.5rem;
+}

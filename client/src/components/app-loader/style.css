@@ -1,0 +1,10 @@
+.loader-overlay {
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+}
+
+.spinner-size-m {
+  width: 4rem !important;
+  height: 4rem !important;
+}

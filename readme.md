@@ -26,3 +26,4 @@
 - add tests
 - deploy LLM
 - find GUI for chat LLM
+- investigate available vector DBs

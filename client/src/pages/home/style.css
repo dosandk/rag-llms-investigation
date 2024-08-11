@@ -1,0 +1,36 @@
+.app-home-page {
+  height: calc(100% - 2px);
+}
+
+.home-page-content {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  outline: 1px solid lightgray;
+}
+
+.page-side {
+  /* outline: 1px solid red; */
+  flex: 1 1 50%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page-delimeter {
+  width: 1px;
+  background: lightgray;
+}
+
+/* .chat-conteiner { */
+/*   /* width: 50%; */
+
+/*   outline: 1px solid red; */
+/*   flex: 1 1 50%; */
+/*   height: 100%; */
+/* } */
+/**/
+/* .document-container { */
+/*   outline: 1px solid blue; */
+/*   flex: 1 1 50%; */
+/*   height: 100%; */
+/* } */
