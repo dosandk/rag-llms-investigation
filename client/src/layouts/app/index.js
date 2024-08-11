@@ -4,6 +4,7 @@ import Footer from "../../components/footer/index.js";
 
 import "./style.css";
 
+/** @jsx globalThis[Symbol.for("createElement")] */
 export default class App extends BaseComponent {
   element;
   components = {};
@@ -32,12 +33,12 @@ export default class App extends BaseComponent {
   }
 
   get template() {
-    return `
-      <main class="app-main">
+    return (
+      <main class="app-main container-fluid">
         <header class="header" data-element="header"></header>
-        <div id="content" class="content container-fluid"></div>
+        <div id="content" class="content"></div>
         <footer class="footer" data-element="footer"></footer>
       </main>
-    `;
+    );
   }
 }

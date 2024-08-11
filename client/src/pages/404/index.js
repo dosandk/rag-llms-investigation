@@ -1,5 +1,6 @@
 import BaseComponent from "../../components/base.js";
 
+/** @jsx globalThis[Symbol.for("createElement")] */
 export default class Error404 extends BaseComponent {
   constructor() {
     super();
@@ -7,11 +8,11 @@ export default class Error404 extends BaseComponent {
   }
 
   get template() {
-    return `
+    return (
       <div>
         <h2 class="app-page-title">404 Page</h2>
         <a href="/">go to home</a>
       </div>
-    `;
+    );
   }
 }

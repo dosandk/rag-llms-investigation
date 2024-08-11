@@ -1,3 +1,4 @@
+import initJsxSupport from "./jsx-support.js";
 import router from "./router/index.js";
 import routes from "./routes.js";
 
@@ -10,6 +11,7 @@ window.addEventListener("unhandledrejection", (event) => {
 
 const run = async () => {
   try {
+    initJsxSupport();
     router.init().addRoutes(routes).listen();
   } catch (error) {
     console.error("App error: ", error);

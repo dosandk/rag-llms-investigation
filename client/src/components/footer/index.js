@@ -2,6 +2,7 @@ import BaseComponent from "../base";
 
 import "./style.css";
 
+/** @jsx globalThis[Symbol.for("createElement")] */
 export default class Footer extends BaseComponent {
   constructor() {
     super();
@@ -9,6 +10,6 @@ export default class Footer extends BaseComponent {
   }
 
   get template() {
-    return `<div>some footer here...</div>`;
+    return <div>some footer here...</div>;
   }
 }

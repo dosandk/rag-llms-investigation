@@ -2,6 +2,7 @@ import BaseComponent from "../base";
 
 import "./style.css";
 
+/** @jsx globalThis[Symbol.for("createElement")] */
 export default class Header extends BaseComponent {
   constructor() {
     super();
@@ -9,6 +10,6 @@ export default class Header extends BaseComponent {
   }
 
   get template() {
-    return `<div>some header here...</div>`;
+    return <div>some header here...</div>;
   }
 }

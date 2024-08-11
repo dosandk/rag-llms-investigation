@@ -3,11 +3,11 @@ import cors from "cors";
 
 import ragResponseMock from "./rag-response-mock.js";
 
-// const wait = async (duration = 0) => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve(), duration);
-//   });
-// };
+const wait = async (duration = 0) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), duration);
+  });
+};
 
 const app = express();
 
@@ -41,7 +41,8 @@ app.post("/test", async (req, res) => {
   const answerArr = answer.split(" ");
 
   for (const word of answerArr) {
-    res.write(JSON.stringify({ answer: word }) + chunkDelimeter);
+    res.write(JSON.stringify({ answer: word + " " }) + chunkDelimeter);
+    await wait(200);
   }
 
   res.end();

@@ -2,33 +2,215 @@ import BaseComponent from "../../components/base.js";
 
 // TODO: temp solution
 import doc from "./document.js";
-
 import "./style.css";
 
-export default class HomePage extends BaseComponent {
+/** @jsx globalThis[Symbol.for("createElement")] */
+class MessagesList extends BaseComponent {
   constructor() {
     super();
     this.init();
   }
 
+  addAIMessage() {
+    const listItem = document.createElement("li");
+
+    this.element.append(listItem);
+
+    return listItem;
+  }
+
+  addHumanMessage(question = "") {
+    const listItem = document.createElement("li");
+
+    listItem.innerHTML = question;
+
+    this.element.append(listItem);
+  }
+
+  addMessage(question = "") {
+    this.addHumanMessage(question);
+
+    const listItem = this.addAIMessage();
+
+    return listItem;
+  }
+
   get template() {
-    return `
+    return <ul></ul>;
+  }
+}
+
+export default class HomePage extends BaseComponent {
+  BACKEND_URL = "http://localhost:9003/test";
+  abortController = new AbortController();
+  components = {};
+  loading = false;
+
+  constructor() {
+    super();
+    this.components.messagesList = new MessagesList();
+    this.init();
+  }
+
+  stopResponse = () => {
+    this.abortController.abort("Aborted by user");
+    this.subElements.messageForm.reset();
+    this.endLoading();
+  };
+
+  onFormSubmit = (event) => {
+    event.preventDefault();
+
+    const { messageForm } = this.subElements;
+    const { userMessage } = messageForm.elements;
+    const question = userMessage.value.trim();
+
+    if (!question) {
+      return;
+    }
+
+    if (this.loading) {
+      return;
+    }
+
+    this.abortController = new AbortController();
+
+    // TODO: add message container
+    const listItem = this.components.messagesList.addMessage(question);
+
+    messageForm.reset();
+
+    this.getData(question, (chunk = "") => {
+      listItem.append(chunk);
+    });
+  };
+
+  async getResponse(question = "") {
+    try {
+      const response = await fetch(this.BACKEND_URL, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          question,
+          stream: true,
+        }),
+        signal: this.abortController.signal,
+      });
+
+      return response;
+    } catch (error) {
+      console.log("Error getting response: ", error);
+    }
+  }
+
+  async readResponse(reader, decoder, callback) {
+    const read = async () => {
+      console.error("abortController", this.abortController);
+
+      const { done, value } = await reader.read();
+
+      if (done) {
+        console.log("Response readed!");
+        return;
+      }
+
+      const chunk = decoder.decode(value, { stream: true });
+      const arr = chunk.split("\n\t\t\t\n");
+
+      for (const item of arr) {
+        if (!item) continue;
+
+        const json = JSON.parse(item);
+
+        if (json.answer) {
+          callback(json.answer);
+        }
+      }
+
+      await read(reader, decoder, callback);
+    };
+
+    // NOTE: prevent caching reader from prev call, to finish reading of prev response call read without props
+    await read(reader, decoder, callback);
+  }
+
+  startLoading() {
+    // TODO: disable form
+    this.loading = true;
+  }
+
+  endLoading() {
+    // TODO: undisable form
+    this.loading = false;
+  }
+
+  async getData(question = "", callback) {
+    if (this.loading === true) {
+      return;
+    }
+
+    try {
+      this.startLoading();
+      const response = await this.getResponse(question);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      await this.readResponse(reader, decoder, callback);
+      this.endLoading();
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  }
+
+  get template() {
+    const { messagesList } = this.components;
+    return (
       <div class="app-home-page d-flex flex-column">
         <h2 class="app-page-title">Home Page</h2>
 
         <div class="home-page-content">
-          <div data-element="document-container" class="page-side p-3">
-            ${doc}
-          </div>
+          <div data-element="documentContainer" class="page-side"></div>
           <div class="page-delimeter h-100"></div>
-          <div data-element="chat-conteiner" class="page-side p-3">
-
-<div class="stChatMessage st-emotion-cache-4oy321 eeusbqq4" data-testid="stChatMessage"><div data-testid="chatAvatarIcon-assistant" class="st-emotion-cache-bho8sy eeusbqq1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor" xmlns="http://www.w3.org/2000/svg" color="inherit" class="eyeqlp51 st-emotion-cache-1pbsqtx ex0cdmw0"><rect width="24" height="24" fill="none"></rect><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zm-2 10H6V7h12v12zm-9-6c-.83 0-1.5-.67-1.5-1.5S8.17 10 9 10s1.5.67 1.5 1.5S9.83 13 9 13zm7.5-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM8 15h8v2H8v-2z"></path></svg></div><div data-testid="stChatMessageContent" aria-label="Chat message from assistant" class="st-emotion-cache-1flajlm eeusbqq3"><div data-testid="stVerticalBlockBorderWrapper" data-test-scroll-behavior="normal" class="st-emotion-cache-0 e1f1d6gn0"><div class="st-emotion-cache-1wmy9hl e1f1d6gn1"><div width="648" data-testid="stVerticalBlock" class="st-emotion-cache-x2svlt e1f1d6gn2"><div data-stale="false" width="648" class="element-container st-emotion-cache-j795b7 e1f1d6gn4" data-testid="element-container"><div class="stMarkdown" data-testid="stMarkdown" style="width: 648px;"><div data-testid="stMarkdownContainer" class="st-emotion-cache-eqffof e1nzilvr5"><p>Hey! I am Magic Chat, your assistant for finding the best Magic The Gathering cards to build your dream deck. Let's get started!</p></div></div></div></div></div></div></div></div>
-
-
-</div>
+          <div data-element="chatConteiner" class="page-side">
+            <div class="chat">
+              <div class="chat-messages-list">{messagesList.element}</div>
+              <div class="chat-user-input">
+                {/* TODO: move to separate component */}
+                <form
+                  data-element="messageForm"
+                  class="message-form"
+                  onSubmit={this.onFormSubmit}
+                >
+                  <fieldset
+                    data-element="formFieldset"
+                    class="message-form-fieldset"
+                  >
+                    <textarea
+                      placeholder="your awesome message"
+                      name="userMessage"
+                      class="form-text-field border"
+                    ></textarea>
+                    <input class="btn border btn-default" type="submit" />
+                    <button
+                      type="button"
+                      onClick={this.stopResponse}
+                      class="btn border btn-default"
+                    >
+                      Stop
+                    </button>
+                  </fieldset>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    `;
+    );
+  }
+
+  afterDestroy() {
+    this.abortController.abort();
   }
 }

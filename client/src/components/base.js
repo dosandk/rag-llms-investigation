@@ -1,5 +1,11 @@
+/** @jsx globalThis[Symbol.for("createElement")] */
 export default class BaseComponent {
   subElements = {};
+
+  constructor(props, children) {
+    this.props = props;
+    this.children = children;
+  }
 
   init() {
     this.beforeRender();
@@ -13,7 +19,7 @@ export default class BaseComponent {
   }
 
   get template() {
-    return ``;
+    return <div></div>;
   }
 
   showAlert(type = "", message = "") {
@@ -21,11 +27,14 @@ export default class BaseComponent {
   }
 
   render() {
-    const element = document.createElement("div");
+    this.element = this.template;
 
-    element.innerHTML = this.template;
+    const { name } = this.constructor;
 
-    this.element = element.firstElementChild;
+    this.element.dataset.element =
+      name.slice(0, 1).toLowerCase() + name.slice(1, name.length);
+
+    return this.element;
   }
 
   afterRender() {
