@@ -4,6 +4,9 @@ const createElement = (tag, props, ...children) => {
     if (isClass(tag)) {
       return new tag(props, ...children).element;
     }
+    // if (tag === DocumentFragment) {
+    //   return new tag(props, ...children);
+    // }
 
     return tag(props, ...children);
   }

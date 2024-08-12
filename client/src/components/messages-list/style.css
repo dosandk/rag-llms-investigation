@@ -1,0 +1,58 @@
+.human-message,
+.ai-message {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  /* gap: 0.5rem; */
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.message-wrapper {
+  width: 100%;
+  display: flex;
+}
+
+.left-side,
+.right-side {
+  height: 100%;
+  display: flex;
+}
+
+.right-side {
+  width: 100%;
+  align-items: center;
+}
+
+.message-wrapper .left-side {
+  flex-basis: 40px;
+}
+
+.left-side .bi-robot,
+.left-side .bi-person,
+.message-box {
+  padding: 0.5rem;
+}
+
+.left-side .bi-robot {
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.left-side .bi-person {
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.message-box {
+  width: 100%;
+  /* display: inline-block; */
+  /* justify-content: center; */
+  /* align-items: center; */
+}
+
+.human-message {
+  background: #d9d9d9;
+}

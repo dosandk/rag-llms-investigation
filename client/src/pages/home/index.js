@@ -1,45 +1,13 @@
 import BaseComponent from "../../components/base.js";
+import DocPreview from "../../components/doc-preview/index.js";
+import MessagesList from "../../components/messages-list/index.js";
+import markdownRender from "../../libs/markdown-render/index.js";
+// NOTE: keep it import to enable bootstrap javaScript actions
+import { Accordion } from "bootstrap";
 
-// TODO: temp solution
-import doc from "./document.js";
 import "./style.css";
 
 /** @jsx globalThis[Symbol.for("createElement")] */
-class MessagesList extends BaseComponent {
-  constructor() {
-    super();
-    this.init();
-  }
-
-  addAIMessage() {
-    const listItem = document.createElement("li");
-
-    this.element.append(listItem);
-
-    return listItem;
-  }
-
-  addHumanMessage(question = "") {
-    const listItem = document.createElement("li");
-
-    listItem.innerHTML = question;
-
-    this.element.append(listItem);
-  }
-
-  addMessage(question = "") {
-    this.addHumanMessage(question);
-
-    const listItem = this.addAIMessage();
-
-    return listItem;
-  }
-
-  get template() {
-    return <ul></ul>;
-  }
-}
-
 export default class HomePage extends BaseComponent {
   BACKEND_URL = "http://localhost:9003/test";
   abortController = new AbortController();
@@ -58,7 +26,16 @@ export default class HomePage extends BaseComponent {
     this.endLoading();
   };
 
-  onFormSubmit = (event) => {
+  onKeyPress = (event) => {
+    // TODO: add sending message via keyboard
+    if (event.key === "Enter" || event.keyCode === 13) {
+      event.preventDefault();
+
+      // add some logic here
+    }
+  };
+
+  onFormSubmit = async (event) => {
     event.preventDefault();
 
     const { messageForm } = this.subElements;
@@ -75,15 +52,160 @@ export default class HomePage extends BaseComponent {
 
     this.abortController = new AbortController();
 
-    // TODO: add message container
-    const listItem = this.components.messagesList.addMessage(question);
+    const { messagesList } = this.components;
+
+    messagesList.addHumanMessage(question);
+    messagesList.addAiMessagePlaceholder();
 
     messageForm.reset();
 
-    this.getData(question, (chunk = "") => {
-      listItem.append(chunk);
+    const cursor = document.createElement("span");
+
+    cursor.innerHTML = "▌";
+    cursor.classList.add("message-cursor");
+
+    const messageBox = messagesList.lastListItem.querySelector(".message-box");
+
+    let isFirstChunk = true;
+
+    await this.getData(question, (chunk = "") => {
+      if (isFirstChunk) {
+        messageBox.innerHTML = "";
+      }
+      messageBox.append(chunk);
+      messageBox.append(cursor);
+      this.scrollElementDown(messageBox);
+      isFirstChunk = false;
     });
+
+    cursor.remove();
+
+    const content = messageBox.innerHTML;
+
+    messageBox.innerHTML = this.transformTxtToMarkdown(content);
+
+    const Template = this.getSourcesTemplate();
+
+    messageBox.append(<Template />);
+
+    this.scrollElementDown(messageBox);
   };
+
+  getSourcesTemplate() {
+    // TODO: move accordion to separate component
+    const Template = () => {
+      return (
+        <div class="accordion" id="accordionExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="true"
+                aria-controls="collapseOne"
+              >
+                Accordion Item #1
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              class="accordion-collapse collapse show"
+              aria-labelledby="headingOne"
+              data-bs-parent="#accordionExample"
+            >
+              <div class="accordion-body">
+                <strong>This is the first item's accordion body.</strong> It is
+                shown by default, until the collapse plugin adds the appropriate
+                classes that we use to style each element. These classes control
+                the overall appearance, as well as the showing and hiding via
+                CSS transitions. You can modify any of this with custom CSS or
+                overriding our default variables. It's also worth noting that
+                just about any HTML can go within the{" "}
+                <code>.accordion-body</code>, though the transition does limit
+                overflow.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                Accordion Item #2
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingTwo"
+              data-bs-parent="#accordionExample"
+            >
+              <div class="accordion-body">
+                <strong>This is the second item's accordion body.</strong> It is
+                hidden by default, until the collapse plugin adds the
+                appropriate classes that we use to style each element. These
+                classes control the overall appearance, as well as the showing
+                and hiding via CSS transitions. You can modify any of this with
+                custom CSS or overriding our default variables. It's also worth
+                noting that just about any HTML can go within the{" "}
+                <code>.accordion-body</code>, though the transition does limit
+                overflow.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                Accordion Item #3
+              </button>
+            </h2>
+            <div
+              id="collapseThree"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingThree"
+              data-bs-parent="#accordionExample"
+            >
+              <div class="accordion-body">
+                <strong>This is the third item's accordion body.</strong> It is
+                hidden by default, until the collapse plugin adds the
+                appropriate classes that we use to style each element. These
+                classes control the overall appearance, as well as the showing
+                and hiding via CSS transitions. You can modify any of this with
+                custom CSS or overriding our default variables. It's also worth
+                noting that just about any HTML can go within the{" "}
+                <code>.accordion-body</code>, though the transition does limit
+                overflow.
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    return Template;
+  }
+
+  transformTxtToMarkdown(text = "") {
+    return markdownRender(text);
+  }
+
+  scrollElementDown(element) {
+    element.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
 
   async getResponse(question = "") {
     try {
@@ -107,8 +229,6 @@ export default class HomePage extends BaseComponent {
 
   async readResponse(reader, decoder, callback) {
     const read = async () => {
-      console.error("abortController", this.abortController);
-
       const { done, value } = await reader.read();
 
       if (done) {
@@ -126,6 +246,11 @@ export default class HomePage extends BaseComponent {
 
         if (json.answer) {
           callback(json.answer);
+        }
+
+        if (json.context) {
+          console.error(json.context);
+          this.responseContext = json.context;
         }
       }
 
@@ -166,16 +291,20 @@ export default class HomePage extends BaseComponent {
 
   get template() {
     const { messagesList } = this.components;
+
     return (
       <div class="app-home-page d-flex flex-column">
-        <h2 class="app-page-title">Home Page</h2>
-
         <div class="home-page-content">
-          <div data-element="documentContainer" class="page-side"></div>
+          <div data-element="documentContainer" class="page-side">
+            <DocPreview />
+          </div>
           <div class="page-delimeter h-100"></div>
           <div data-element="chatConteiner" class="page-side">
             <div class="chat">
-              <div class="chat-messages-list">{messagesList.element}</div>
+              <div class="chat-messages-list">
+                <h3 class="text-center">Some welcome message!</h3>
+                {messagesList.element}
+              </div>
               <div class="chat-user-input">
                 {/* TODO: move to separate component */}
                 <form
@@ -187,12 +316,16 @@ export default class HomePage extends BaseComponent {
                     data-element="formFieldset"
                     class="message-form-fieldset"
                   >
-                    <textarea
-                      placeholder="your awesome message"
-                      name="userMessage"
-                      class="form-text-field border"
-                    ></textarea>
-                    <input class="btn border btn-default" type="submit" />
+                    <div class="input-group">
+                      <textarea
+                        name="userMessage"
+                        class="form-control form-text-field border"
+                        placeholder="Enter your question"
+                      />
+                      <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i>
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={this.stopResponse}

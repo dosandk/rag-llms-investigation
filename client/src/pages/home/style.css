@@ -1,18 +1,17 @@
 .app-home-page {
-  height: calc(100% - 2px);
+  height: 100%;
 }
 
 .home-page-content {
   display: flex;
   flex-direction: row;
   height: 100%;
-  outline: 1px solid lightgray;
 }
 
 .page-side {
   flex: 1 1 50%;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .page-delimeter {
@@ -32,8 +31,7 @@
 
 .chat-messages-list {
   flex-grow: 2;
-  border: 1px solid lightgray;
-  border-radius: 5px;
+  overflow: auto;
 }
 
 .chat-user-input {
@@ -42,6 +40,11 @@
 }
 
 /* CHAT end*/
+
+.messages-list {
+  list-style-type: none;
+  padding: 0;
+}
 
 .message-form {
   border: 0;
