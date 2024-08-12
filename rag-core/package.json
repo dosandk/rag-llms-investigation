@@ -5,10 +5,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "parse-docs": "node ./docs-parser/index.js",
+    "parse-docs": "node -r dotenv/config ./docs-parser/index.js",
     "remove-db": "rimraf ./chroma-data ./chroma.log",
     "start:cli": "node ./cli/index.js",
-    "start:server": "nodemon --inspect ./server/index.js",
+    "start:server": "nodemon -r dotenv/config --inspect ./server/index.js",
     "deploy": ""
   },
   "author": "",
