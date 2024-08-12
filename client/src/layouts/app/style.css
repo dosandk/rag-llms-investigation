@@ -1,0 +1,19 @@
+.app-main {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+}
+
+.header,
+.footer {
+  flex-basis: 50px;
+}
+
+.app-page-title {
+  font-size: 2rem;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+}
