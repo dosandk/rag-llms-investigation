@@ -67,6 +67,9 @@ const getRagChain = async () => {
     // kIncrement: 2, // How much to increase K by each time. It'll fetch N results, then N + kIncrement, then N + kIncrement * 2, etc.
   });
 
+  // In order to search in vector store not just based on users query
+  // but also include chat history and then reprase the query
+  // we need this special type of retriever and not just simple vector store (as a retriever)
   const historyAwareRetriever = await createHistoryAwareRetriever({
     llm,
     retriever,

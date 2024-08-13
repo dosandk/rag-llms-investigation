@@ -58,7 +58,7 @@ const initApp = (ragChain) => {
     const { chat_history, input, context, answer } = ragResponseMock;
     const chunkDelimeter = "\n\t\t\t\n";
 
-    res.write(JSON.stringify({ history: chat_history}) + chunkDelimeter);
+    res.write(JSON.stringify({ history: chat_history }) + chunkDelimeter);
     res.write(JSON.stringify({ input }) + chunkDelimeter);
     res.write(JSON.stringify({ context }) + chunkDelimeter);
 
