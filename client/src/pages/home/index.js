@@ -2,21 +2,20 @@ import BaseComponent from "../../components/base.js";
 import DocPreview from "../../components/doc-preview/index.js";
 import MessagesList from "../../components/messages-list/index.js";
 import markdownRender from "../../libs/markdown-render/index.js";
-// NOTE: keep it import to enable bootstrap javaScript actions
-import { Accordion } from "bootstrap";
 
 import "./style.css";
 
 /** @jsx globalThis[Symbol.for("createElement")] */
 export default class HomePage extends BaseComponent {
   BACKEND_URL = "http://localhost:9003/test";
+
   abortController = new AbortController();
   components = {};
   loading = false;
 
   constructor() {
     super();
-    this.components.messagesList = new MessagesList();
+    this.components.messagesList = new MessagesList(this.getData);
     this.init();
   }
 
@@ -52,152 +51,10 @@ export default class HomePage extends BaseComponent {
 
     this.abortController = new AbortController();
 
-    const { messagesList } = this.components;
-
-    messagesList.addHumanMessage(question);
-    messagesList.addAiMessagePlaceholder();
-
     messageForm.reset();
 
-    const cursor = document.createElement("span");
-
-    cursor.innerHTML = "▌";
-    cursor.classList.add("message-cursor");
-
-    const messageBox = messagesList.lastListItem.querySelector(".message-box");
-
-    let isFirstChunk = true;
-
-    await this.getData(question, (chunk = "") => {
-      if (isFirstChunk) {
-        messageBox.innerHTML = "";
-      }
-      messageBox.append(chunk);
-      messageBox.append(cursor);
-      this.scrollElementDown(messageBox);
-      isFirstChunk = false;
-    });
-
-    cursor.remove();
-
-    const content = messageBox.innerHTML;
-
-    messageBox.innerHTML = this.transformTxtToMarkdown(content);
-
-    const Template = this.getSourcesTemplate();
-
-    messageBox.append(<Template />);
-
-    this.scrollElementDown(messageBox);
+    await this.components.messagesList.recieveData(question);
   };
-
-  getSourcesTemplate() {
-    // TODO: move accordion to separate component
-    const Template = () => {
-      return (
-        <div class="accordion" id="accordionExample">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-              <button
-                class="accordion-button"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseOne"
-                aria-expanded="true"
-                aria-controls="collapseOne"
-              >
-                Accordion Item #1
-              </button>
-            </h2>
-            <div
-              id="collapseOne"
-              class="accordion-collapse collapse show"
-              aria-labelledby="headingOne"
-              data-bs-parent="#accordionExample"
-            >
-              <div class="accordion-body">
-                <strong>This is the first item's accordion body.</strong> It is
-                shown by default, until the collapse plugin adds the appropriate
-                classes that we use to style each element. These classes control
-                the overall appearance, as well as the showing and hiding via
-                CSS transitions. You can modify any of this with custom CSS or
-                overriding our default variables. It's also worth noting that
-                just about any HTML can go within the{" "}
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseTwo"
-                aria-expanded="false"
-                aria-controls="collapseTwo"
-              >
-                Accordion Item #2
-              </button>
-            </h2>
-            <div
-              id="collapseTwo"
-              class="accordion-collapse collapse"
-              aria-labelledby="headingTwo"
-              data-bs-parent="#accordionExample"
-            >
-              <div class="accordion-body">
-                <strong>This is the second item's accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classes that we use to style each element. These
-                classes control the overall appearance, as well as the showing
-                and hiding via CSS transitions. You can modify any of this with
-                custom CSS or overriding our default variables. It's also worth
-                noting that just about any HTML can go within the{" "}
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThree">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseThree"
-                aria-expanded="false"
-                aria-controls="collapseThree"
-              >
-                Accordion Item #3
-              </button>
-            </h2>
-            <div
-              id="collapseThree"
-              class="accordion-collapse collapse"
-              aria-labelledby="headingThree"
-              data-bs-parent="#accordionExample"
-            >
-              <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classes that we use to style each element. These
-                classes control the overall appearance, as well as the showing
-                and hiding via CSS transitions. You can modify any of this with
-                custom CSS or overriding our default variables. It's also worth
-                noting that just about any HTML can go within the{" "}
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    return Template;
-  }
 
   transformTxtToMarkdown(text = "") {
     return markdownRender(text);
@@ -223,16 +80,18 @@ export default class HomePage extends BaseComponent {
 
       return response;
     } catch (error) {
-      console.log("Error getting response: ", error);
+      console.error("Error getting response: ", error);
+      throw new Error(error);
     }
   }
 
   async readResponse(reader, decoder, callback) {
-    const read = async () => {
+    const read = async (reader, decoder, callback, count) => {
       const { done, value } = await reader.read();
 
       if (done) {
         console.log("Response readed!");
+        callback({ done: true, json: {} });
         return;
       }
 
@@ -244,21 +103,14 @@ export default class HomePage extends BaseComponent {
 
         const json = JSON.parse(item);
 
-        if (json.answer) {
-          callback(json.answer);
-        }
-
-        if (json.context) {
-          console.error(json.context);
-          this.responseContext = json.context;
-        }
+        callback({ count, json, done: false, count });
       }
 
-      await read(reader, decoder, callback);
+      await read(reader, decoder, callback, count + 1);
     };
 
     // NOTE: prevent caching reader from prev call, to finish reading of prev response call read without props
-    await read(reader, decoder, callback);
+    await read(reader, decoder, callback, 0);
   }
 
   startLoading() {
@@ -271,7 +123,7 @@ export default class HomePage extends BaseComponent {
     this.loading = false;
   }
 
-  async getData(question = "", callback) {
+  getData = async (question = "", callback) => {
     if (this.loading === true) {
       return;
     }
@@ -283,11 +135,14 @@ export default class HomePage extends BaseComponent {
       const decoder = new TextDecoder();
 
       await this.readResponse(reader, decoder, callback);
+
       this.endLoading();
+      return { error: false };
     } catch (error) {
-      console.log("Error: ", error);
+      console.error(error);
+      return { error: true };
     }
-  }
+  };
 
   get template() {
     const { messagesList } = this.components;
@@ -302,7 +157,10 @@ export default class HomePage extends BaseComponent {
           <div data-element="chatConteiner" class="page-side">
             <div class="chat">
               <div class="chat-messages-list">
-                <h3 class="text-center">Some welcome message!</h3>
+                <h3 class="text-center welcome-message">
+                  <span class="ollama-logo"></span>
+                  <span>Hello, I'm Ollam3. How can I help you today?</span>
+                </h3>
                 {messagesList.element}
               </div>
               <div class="chat-user-input">

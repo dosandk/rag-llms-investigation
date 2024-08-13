@@ -1,12 +1,98 @@
 import BaseComponent from "../base.js";
+import markdownRender from "../../libs/markdown-render/index.js";
+import AppAccordion from "../accordion/index.js";
 
 import "./style.css";
 
 /** @jsx globalThis[Symbol.for("createElement")] */
 export default class MessagesList extends BaseComponent {
-  constructor() {
+  constructor(dataProvider) {
     super();
     this.init();
+    this.dataProvider = dataProvider;
+  }
+
+  createCursor() {
+    const cursor = document.createElement("span");
+
+    cursor.innerHTML = "▌";
+
+    return cursor;
+  }
+
+  resetAiMessagePlaceholder(text = "") {
+    const messageBox = this.lastListItem.querySelector(".message-box");
+    messageBox.innerHTML = text;
+  }
+
+  async recieveData(question = "") {
+    this.addHumanMessage(question);
+    this.addAiMessagePlaceholder();
+
+    const cursor = this.createCursor();
+    const messageBox = this.lastListItem.querySelector(".message-box");
+
+    const responseDataAccumulated = {
+      answer: [],
+      context: [],
+    };
+
+    const result = await this.dataProvider(
+      question,
+      ({ json, count, done } = {}) => {
+        if (count === 0) {
+          this.resetAiMessagePlaceholder();
+        }
+
+        console.log("chunk", count, json, done);
+
+        if (json.answer) {
+          messageBox.append(json.answer);
+          messageBox.append(cursor);
+          responseDataAccumulated.answer.push(json.answer);
+        }
+        if (json.context) {
+          responseDataAccumulated.context.push(...json.context);
+        }
+        this.scrollElementDown(messageBox);
+      },
+    );
+
+    if (result.error) {
+      if (!responseDataAccumulated.answer.length) {
+        this.resetAiMessagePlaceholder("request was cancelled");
+        return;
+      }
+    }
+
+    cursor.remove();
+
+    const content = messageBox.innerHTML;
+
+    messageBox.innerHTML = this.transformTxtToMarkdown(content);
+
+    const sourcesList = this.renderQuestionSource(
+      responseDataAccumulated.context,
+    );
+    messageBox.append(sourcesList);
+
+    this.scrollElementDown(messageBox);
+  }
+
+  renderQuestionSource(sources = []) {
+    const div = document.createElement("div");
+
+    for (const [index, item] of sources.entries()) {
+      const accordion = new AppAccordion(index + 1, item.pageContent);
+
+      div.append(accordion.element);
+    }
+
+    return div;
+  }
+
+  transformTxtToMarkdown(text = "") {
+    return markdownRender(text);
   }
 
   addAiMessagePlaceholder() {
@@ -43,13 +129,6 @@ export default class MessagesList extends BaseComponent {
 
   scrollElementDown(element) {
     element.scrollIntoView({ behavior: "smooth", block: "end" });
-  }
-
-  createCursor() {
-    const cursor = document.createElement("span");
-
-    cursor.innerHTML = "▌";
-    cursor.classList.add("message-cursor");
   }
 
   addHumanMessage(question = "") {
