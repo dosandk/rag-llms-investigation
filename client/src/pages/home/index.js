@@ -22,7 +22,7 @@ export default class HomePage extends BaseComponent {
   stopResponse = () => {
     this.abortController.abort("Aborted by user");
     this.subElements.messageForm.reset();
-    this.endLoading();
+    this.stopLoading();
   };
 
   onKeyPress = (event) => {
@@ -34,10 +34,38 @@ export default class HomePage extends BaseComponent {
     }
   };
 
+  startLoading() {
+    const { formFieldset, stopBtn } = this.subElements;
+
+    this.loading = true;
+    formFieldset.setAttribute("disabled", "true");
+
+    stopBtn.classList.remove("btn-default");
+    stopBtn.classList.add("btn-danger");
+    stopBtn.removeAttribute("disabled");
+  }
+
+  stopLoading() {
+    const { formFieldset, stopBtn } = this.subElements;
+
+    this.loading = false;
+    formFieldset.removeAttribute("disabled");
+
+    stopBtn.classList.add("btn-default");
+    stopBtn.classList.remove("btn-danger");
+    stopBtn.setAttribute("disabled", "true");
+  }
+
   onFormSubmit = async (event) => {
     event.preventDefault();
 
     const { messageForm } = this.subElements;
+
+    if (!messageForm.checkValidity()) {
+      messageForm.classList.add("was-validated");
+      return;
+    }
+
     const { userMessage } = messageForm.elements;
     const question = userMessage.value.trim();
 
@@ -53,7 +81,12 @@ export default class HomePage extends BaseComponent {
 
     messageForm.reset();
 
-    await this.components.messagesList.recieveData(question);
+    try {
+      this.startLoading();
+      await this.components.messagesList.recieveData(question);
+    } finally {
+      this.stopLoading();
+    }
   };
 
   transformTxtToMarkdown(text = "") {
@@ -113,30 +146,14 @@ export default class HomePage extends BaseComponent {
     await read(reader, decoder, callback, 0);
   }
 
-  startLoading() {
-    // TODO: disable form
-    this.loading = true;
-  }
-
-  endLoading() {
-    // TODO: undisable form
-    this.loading = false;
-  }
-
   getData = async (question = "", callback) => {
-    if (this.loading === true) {
-      return;
-    }
-
     try {
-      this.startLoading();
       const response = await this.getResponse(question);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
       await this.readResponse(reader, decoder, callback);
 
-      this.endLoading();
       return { error: false };
     } catch (error) {
       console.error(error);
@@ -166,6 +183,7 @@ export default class HomePage extends BaseComponent {
               <div class="chat-user-input">
                 {/* TODO: move to separate component */}
                 <form
+                  novalidate
                   data-element="messageForm"
                   class="message-form"
                   onSubmit={this.onFormSubmit}
@@ -176,6 +194,7 @@ export default class HomePage extends BaseComponent {
                   >
                     <div class="input-group">
                       <textarea
+                        required
                         name="userMessage"
                         class="form-control form-text-field border"
                         placeholder="Enter your question"
@@ -184,14 +203,16 @@ export default class HomePage extends BaseComponent {
                         <i class="bi bi-send"></i>
                       </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={this.stopResponse}
-                      class="btn border btn-default"
-                    >
-                      Stop
-                    </button>
                   </fieldset>
+                  <button
+                    type="button"
+                    data-element="stopBtn"
+                    disabled
+                    onClick={this.stopResponse}
+                    class="btn border btn-default"
+                  >
+                    <i class="bi bi-stop-circle"></i>
+                  </button>
                 </form>
               </div>
             </div>

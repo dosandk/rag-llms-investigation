@@ -64,6 +64,7 @@
 .message-form-fieldset {
   width: 100%;
   display: flex;
+  padding-right: 10px;
 }
 
 .welcome-message {
