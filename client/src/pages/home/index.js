@@ -1,67 +1,71 @@
 import BaseComponent from "../../components/base.js";
+import DocPreview from "../../components/doc-preview/index.js";
+import MessagesList from "../../components/messages-list/index.js";
+import markdownRender from "../../libs/markdown-render/index.js";
 
-// TODO: temp solution
-import doc from "./document.js";
 import "./style.css";
 
 /** @jsx globalThis[Symbol.for("createElement")] */
-class MessagesList extends BaseComponent {
-  constructor() {
-    super();
-    this.init();
-  }
-
-  addAIMessage() {
-    const listItem = document.createElement("li");
-
-    this.element.append(listItem);
-
-    return listItem;
-  }
-
-  addHumanMessage(question = "") {
-    const listItem = document.createElement("li");
-
-    listItem.innerHTML = question;
-
-    this.element.append(listItem);
-  }
-
-  addMessage(question = "") {
-    this.addHumanMessage(question);
-
-    const listItem = this.addAIMessage();
-
-    return listItem;
-  }
-
-  get template() {
-    return <ul></ul>;
-  }
-}
-
 export default class HomePage extends BaseComponent {
   BACKEND_URL = "http://localhost:9003/test";
+
   abortController = new AbortController();
   components = {};
   loading = false;
 
   constructor() {
     super();
-    this.components.messagesList = new MessagesList();
+    this.components.messagesList = new MessagesList(this.getData);
     this.init();
   }
 
   stopResponse = () => {
     this.abortController.abort("Aborted by user");
     this.subElements.messageForm.reset();
-    this.endLoading();
+    this.stopLoading();
   };
 
-  onFormSubmit = (event) => {
+  onKeyPress = (event) => {
+    // TODO: add sending message via keyboard
+    if (event.key === "Enter" || event.keyCode === 13) {
+      event.preventDefault();
+
+      // add some logic here
+    }
+  };
+
+  startLoading() {
+    const { formFieldset, stopBtn } = this.subElements;
+
+    this.loading = true;
+    formFieldset.setAttribute("disabled", "true");
+
+    stopBtn.classList.remove("btn-default");
+    stopBtn.classList.add("btn-danger");
+    stopBtn.removeAttribute("disabled");
+  }
+
+  stopLoading() {
+    const { formFieldset, stopBtn } = this.subElements;
+
+    this.loading = false;
+    formFieldset.removeAttribute("disabled");
+
+    stopBtn.classList.add("btn-default");
+    stopBtn.classList.remove("btn-danger");
+    stopBtn.setAttribute("disabled", "true");
+  }
+
+  onFormSubmit = async (event) => {
     event.preventDefault();
 
     const { messageForm } = this.subElements;
+
+    if (!messageForm.checkValidity()) {
+      messageForm.classList.add("was-validated");
+      return;
+    }
+
     const { userMessage } = messageForm.elements;
     const question = userMessage.value.trim();
 
@@ -75,15 +79,23 @@ export default class HomePage extends BaseComponent {
 
     this.abortController = new AbortController();
 
-    // TODO: add message container
-    const listItem = this.components.messagesList.addMessage(question);
-
     messageForm.reset();
 
-    this.getData(question, (chunk = "") => {
-      listItem.append(chunk);
-    });
+    try {
+      this.startLoading();
+      await this.components.messagesList.recieveData(question);
+    } finally {
+      this.stopLoading();
+    }
   };
+
+  transformTxtToMarkdown(text = "") {
+    return markdownRender(text);
+  }
+
+  scrollElementDown(element) {
+    element.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
 
   async getResponse(question = "") {
     try {
@@ -101,18 +113,18 @@ export default class HomePage extends BaseComponent {
 
       return response;
     } catch (error) {
-      console.log("Error getting response: ", error);
+      console.error("Error getting response: ", error);
+      throw new Error(error);
     }
   }
 
   async readResponse(reader, decoder, callback) {
-    const read = async () => {
-      console.error("abortController", this.abortController);
-
+    const read = async (reader, decoder, callback, count) => {
       const { done, value } = await reader.read();
 
       if (done) {
         console.log("Response readed!");
+        callback({ done: true, json: {} });
         return;
       }
 
@@ -124,61 +136,54 @@ export default class HomePage extends BaseComponent {
 
         const json = JSON.parse(item);
 
-        if (json.answer) {
-          callback(json.answer);
-        }
+        callback({ count, json, done: false, count });
       }
 
-      await read(reader, decoder, callback);
+      await read(reader, decoder, callback, count + 1);
     };
 
     // NOTE: prevent caching reader from prev call, to finish reading of prev response call read without props
-    await read(reader, decoder, callback);
+    await read(reader, decoder, callback, 0);
   }
 
-  startLoading() {
-    // TODO: disable form
-    this.loading = true;
-  }
-
-  endLoading() {
-    // TODO: undisable form
-    this.loading = false;
-  }
-
-  async getData(question = "", callback) {
-    if (this.loading === true) {
-      return;
-    }
-
+  getData = async (question = "", callback) => {
     try {
-      this.startLoading();
       const response = await this.getResponse(question);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
       await this.readResponse(reader, decoder, callback);
-      this.endLoading();
+
+      return { error: false };
     } catch (error) {
-      console.log("Error: ", error);
+      console.error(error);
+      return { error: true };
     }
-  }
+  };
 
   get template() {
     const { messagesList } = this.components;
+
     return (
       <div class="app-home-page d-flex flex-column">
-        <h2 class="app-page-title">Home Page</h2>
-
         <div class="home-page-content">
-          <div data-element="documentContainer" class="page-side"></div>
+          <div data-element="documentContainer" class="page-side">
+            <DocPreview />
+          </div>
           <div class="page-delimeter h-100"></div>
           <div data-element="chatConteiner" class="page-side">
             <div class="chat">
-              <div class="chat-messages-list">{messagesList.element}</div>
+              <div class="chat-messages-list">
+                <h3 class="text-center welcome-message">
+                  <span class="ollama-logo"></span>
+                  <span>Hello, I'm Ollam3. How can I help you today?</span>
+                </h3>
+                {messagesList.element}
+              </div>
               <div class="chat-user-input">
                 {/* TODO: move to separate component */}
                 <form
+                  novalidate
                   data-element="messageForm"
                   class="message-form"
                   onSubmit={this.onFormSubmit}
@@ -187,20 +192,27 @@ export default class HomePage extends BaseComponent {
                     data-element="formFieldset"
                     class="message-form-fieldset"
                   >
-                    <textarea
-                      placeholder="your awesome message"
-                      name="userMessage"
-                      class="form-text-field border"
-                    ></textarea>
-                    <input class="btn border btn-default" type="submit" />
-                    <button
-                      type="button"
-                      onClick={this.stopResponse}
-                      class="btn border btn-default"
-                    >
-                      Stop
-                    </button>
+                    <div class="input-group">
+                      <textarea
+                        required
+                        name="userMessage"
+                        class="form-control form-text-field border"
+                        placeholder="Enter your question"
+                      />
+                      <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i>
+                      </button>
+                    </div>
                   </fieldset>
+                  <button
+                    type="button"
+                    data-element="stopBtn"
+                    disabled
+                    onClick={this.stopResponse}
+                    class="btn border btn-default"
+                  >
+                    <i class="bi bi-stop-circle"></i>
+                  </button>
                 </form>
               </div>
             </div>

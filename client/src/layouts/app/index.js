@@ -34,9 +34,9 @@ export default class App extends BaseComponent {
 
   get template() {
     return (
-      <main class="app-main container-fluid">
+      <main class="app-main ">
         <header class="header" data-element="header"></header>
-        <div id="content" class="content"></div>
+        <div id="content" class="content container-fluid"></div>
         <footer class="footer" data-element="footer"></footer>
       </main>
     );

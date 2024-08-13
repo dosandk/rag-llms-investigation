@@ -1,18 +1,17 @@
 .app-home-page {
-  height: calc(100% - 2px);
+  height: 100%;
 }
 
 .home-page-content {
   display: flex;
   flex-direction: row;
   height: 100%;
-  outline: 1px solid lightgray;
 }
 
 .page-side {
   flex: 1 1 50%;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .page-delimeter {
@@ -32,8 +31,7 @@
 
 .chat-messages-list {
   flex-grow: 2;
-  border: 1px solid lightgray;
-  border-radius: 5px;
+  overflow: auto;
 }
 
 .chat-user-input {
@@ -42,6 +40,11 @@
 }
 
 /* CHAT end*/
+
+.messages-list {
+  list-style-type: none;
+  padding: 0;
+}
 
 .message-form {
   border: 0;
@@ -61,4 +64,21 @@
 .message-form-fieldset {
   width: 100%;
   display: flex;
+  padding-right: 10px;
+}
+
+.welcome-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.ollama-logo {
+  width: 50px;
+  height: 50px;
+  flex-basis: 50px;
+  margin: 0 0.5rem;
+  display: inline-block;
+  background: url("./ollama.svg") no-repeat;
 }
