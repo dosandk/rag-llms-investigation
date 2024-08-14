@@ -7,6 +7,7 @@
   "scripts": {
     "parse-docs": "node -r dotenv/config ./docs-parser/index.js",
     "remove-db": "rimraf ./chroma-data ./chroma.log",
+    "start": "nodemon -r dotenv/config ./server/index.js",
     "start:cli": "node ./cli/index.js",
     "start:server": "nodemon -r dotenv/config --inspect ./server/index.js",
     "deploy": ""

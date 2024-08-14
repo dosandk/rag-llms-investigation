@@ -25,8 +25,6 @@ const contextualizeQPrompt = ChatPromptTemplate.fromMessages([
   ["human", "{input}"],
 ]);
 
-console.log("contextualizeQPrompt", contextualizeQPrompt);
-
 // Answer question
 const qaSystemPrompt = `You are a helpful AI assistant. Use the following pieces of context
 to answer the question at the end.

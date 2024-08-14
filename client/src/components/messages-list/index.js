@@ -40,7 +40,7 @@ export default class MessagesList extends BaseComponent {
     const result = await this.dataProvider(
       question,
       ({ json, count, done } = {}) => {
-        if (count === 0) {
+        if (responseDataAccumulated.answer.length === 0 && json.answer) {
           this.resetAiMessagePlaceholder();
         }
 

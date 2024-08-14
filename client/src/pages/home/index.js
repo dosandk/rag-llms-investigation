@@ -6,8 +6,10 @@ import markdownRender from "../../libs/markdown-render/index.js";
 import "./style.css";
 
 /** @jsx globalThis[Symbol.for("createElement")] */
+const { BACKEND_URL } = window[Symbol.for("app-config")];
+
 export default class HomePage extends BaseComponent {
-  BACKEND_URL = "http://localhost:9003/test";
+  RAG_URL = new URL("rag", BACKEND_URL);
 
   abortController = new AbortController();
   components = {};
@@ -25,12 +27,17 @@ export default class HomePage extends BaseComponent {
     this.stopLoading();
   };
 
+  onFormSubmit = (event) => {
+    event.preventDefault();
+
+    this.askQuestion();
+  };
+
   onKeyPress = (event) => {
-    // TODO: add sending message via keyboard
-    if (event.key === "Enter" || event.keyCode === 13) {
+    if (event.key === "Enter" && event.ctrlKey) {
       event.preventDefault();
 
-      // add some logic here
+      this.askQuestion();
     }
   };
 
@@ -56,9 +63,7 @@ export default class HomePage extends BaseComponent {
     stopBtn.setAttribute("disabled", "true");
   }
 
-  onFormSubmit = async (event) => {
-    event.preventDefault();
-
+  async askQuestion() {
     const { messageForm } = this.subElements;
 
     if (!messageForm.checkValidity()) {
@@ -87,7 +92,7 @@ export default class HomePage extends BaseComponent {
     } finally {
       this.stopLoading();
     }
-  };
+  }
 
   transformTxtToMarkdown(text = "") {
     return markdownRender(text);
@@ -99,14 +104,13 @@ export default class HomePage extends BaseComponent {
 
   async getResponse(question = "") {
     try {
-      const response = await fetch(this.BACKEND_URL, {
+      const response = await fetch(this.RAG_URL, {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
           question,
-          stream: true,
         }),
         signal: this.abortController.signal,
       });
@@ -136,7 +140,7 @@ export default class HomePage extends BaseComponent {
 
         const json = JSON.parse(item);
 
-        callback({ count, json, done: false, count });
+        callback({ count, json, done: false });
       }
 
       await read(reader, decoder, callback, count + 1);
@@ -195,6 +199,7 @@ export default class HomePage extends BaseComponent {
                     <div class="input-group">
                       <textarea
                         required
+                        onKeyPress={this.onKeyPress}
                         name="userMessage"
                         class="form-control form-text-field border"
                         placeholder="Enter your question"

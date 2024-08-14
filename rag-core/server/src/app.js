@@ -2,13 +2,6 @@ import express from "express";
 import cors from "cors";
 
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import ragResponseMock from "./rag-response-mock.js"
-
-const wait = async (duration = 0) => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), duration);
-  });
-};
 
 // TODO: manage history size
 const chat_history = [];
@@ -38,37 +31,12 @@ const initApp = (ragChain) => {
       input: question,
     });
 
+    console.error("Result", result);
+
     chatHistory.push(new HumanMessage(question));
     chatHistory.push(new AIMessage(result.answer));
 
     res.status(200).json(result);
-  });
-
-  app.post("/test", async (req, res) => {
-    const { stream } = req.body;
-
-    if (stream === false) {
-      res.status(200).json(ragResponseMock);
-      return;
-    }
-
-    res.setHeader("Content-Type", "text/plain");
-    res.setHeader("Transfer-Encoding", "chunked");
-
-    const { chat_history, input, context, answer } = ragResponseMock;
-    const chunkDelimeter = "\n\t\t\t\n";
-
-    res.write(JSON.stringify({ history: chat_history}) + chunkDelimeter);
-    res.write(JSON.stringify({ input }) + chunkDelimeter);
-    res.write(JSON.stringify({ context }) + chunkDelimeter);
-
-    const answerArr = answer.split(" ");
-
-    for (const word of answerArr) {
-      res.write(JSON.stringify({ answer: word }) + chunkDelimeter);
-    }
-
-    res.end();
   });
 
   app.post("/chat-with-stream", async (req, res) => {
@@ -77,26 +45,36 @@ const initApp = (ragChain) => {
 
     const { question } = req.body;
 
-    console.log("question:", question);
+    try {
+      console.log("question:", question);
 
-    const answerData = [];
-    const stream = await ragChain.stream({ input: question, chat_history: chat_history });
+      const answerData = [];
+      const stream = await ragChain.stream({
+        input: question,
+        chat_history: chat_history,
+      });
 
-    const chunkDelimeter = "\n\t\t\t\n";
+      const chunkDelimeter = "\n\t\t\t\n";
 
-    for await (const chunk of stream) {
-      console.log("chunk", chunk);
+      for await (const chunk of stream) {
+        console.log("chunk", chunk);
 
-      res.write(JSON.stringify(chunk) + chunkDelimeter);
+        res.write(JSON.stringify(chunk) + chunkDelimeter);
 
-      if (chunk.answer) {
-        answerData.push(chunk.answer);
+        if (chunk.answer) {
+          answerData.push(chunk.answer);
+        }
       }
-    }
 
-    chat_history.push(new HumanMessage(question));
-    chat_history.push(new AIMessage(answerData.join("")));
-    res.end();
+      // TODO: make chat histoy stateless and keep it only inside requests...
+      chat_history.push(new HumanMessage(question));
+      chat_history.push(new AIMessage(answerData.join("")));
+      res.end();
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({ error });
+      res.end();
+    }
   });
 
   app.all("*", async () => {

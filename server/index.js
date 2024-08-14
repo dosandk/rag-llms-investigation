@@ -1,7 +1,7 @@
 import app from "./src/app.js";
 
 const start = async () => {
-  const PORT = process.env.PORT || 9003;
+  const PORT = process.env.PORT;
 
   if (!PORT) {
     throw new Error("PORT must be defined");
@@ -12,7 +12,7 @@ const start = async () => {
   });
 
   app.listen(PORT, () => {
-    console.info(`Product server is running on port ${PORT}`);
+    console.info(`Server is running on port ${PORT}`);
   });
 };
 

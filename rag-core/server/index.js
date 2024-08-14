@@ -2,7 +2,7 @@ import initApp from "./src/app.js";
 import getRagChain from "../langchain/index.js";
 
 const start = async () => {
-  const PORT = process.env.PORT || 9002;
+  const PORT = process.env.PORT;
 
   if (!PORT) {
     throw new Error("PORT must be defined");
@@ -16,7 +16,7 @@ const start = async () => {
   const app = initApp(ragChain, retriever);
 
   app.listen(PORT, () => {
-    console.info(`Product server is running on port ${PORT}`);
+    console.info(`RAG server is running on port ${PORT}`);
   });
 };
 

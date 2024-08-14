@@ -1,6 +1,4 @@
-const NODE_ENV = process.env.NODE_ENV || "";
-
-require("dotenv").config({ path: `${NODE_ENV}.env` });
+require("dotenv").config();
 
 const path = require("path");
 const webpack = require("webpack");

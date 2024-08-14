@@ -53,13 +53,13 @@ const run = async () => {
   // NOTE: use it only with UnstructuredLoader
   // const splits = await textSplitter.splitDocuments(rawDocs);
 
-  try {
-    writeFileSync("./splits.json", JSON.stringify(splits), {
-      encoding: "utf8",
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   writeFileSync("./splits.json", JSON.stringify(splits), {
+  //     encoding: "utf8",
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
   try {
     await db.resetDb();
