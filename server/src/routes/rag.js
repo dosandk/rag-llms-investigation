@@ -11,14 +11,18 @@ if (!RAG_CORE_URL) {
 router.post("/rag", async (req, res) => {
   try {
     const { question } = req.body;
+    const { userId } = req.session;
 
-    const response = await fetch(RAG_CORE_URL + "/chat-with-stream", {
+    console.error("userId", userId);
+
+    const response = await fetch(RAG_CORE_URL + "/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         question,
+        userId,
       }),
     });
 
@@ -33,6 +37,7 @@ router.post("/rag", async (req, res) => {
       }
     });
   } catch (error) {
+    console.error(error);
     res.status(400).json({ error });
   }
 });

@@ -10,6 +10,7 @@ const { BACKEND_URL } = window[Symbol.for("app-config")];
 
 export default class HomePage extends BaseComponent {
   RAG_URL = new URL("rag", BACKEND_URL);
+  // RAG_URL = new URL("test", BACKEND_URL);
 
   abortController = new AbortController();
   components = {};
@@ -109,6 +110,7 @@ export default class HomePage extends BaseComponent {
         headers: {
           "content-type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           question,
         }),

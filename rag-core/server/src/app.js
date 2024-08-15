@@ -2,11 +2,15 @@ import express from "express";
 import cors from "cors";
 
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { db } from "../../db/memory-db.js";
+import getRagChain from "../../langchain/index.js";
+import { loadDocs } from "../../utils/load-docs.js";
+import { embeddings } from "../../llm/index.js";
+import { Document } from "@langchain/core/documents";
 
-// TODO: manage history size
 const chat_history = [];
 
-const initApp = (ragChain) => {
+const initApp = (mainVectorStore) => {
   const app = express();
 
   app.set("trust proxy", true);
@@ -18,64 +22,60 @@ const initApp = (ragChain) => {
   );
   app.use(express.json());
 
-  // NOTE: store history for "chat" endpoint in the separate variable
-  const chatHistory = [];
+  // TODO: implement service for stores clearing
+  const stores = {
+    // userId: { expDate: "", vectoreStore: {} }
+  };
 
-  app.post("/chat", async (req, res) => {
-    const { question } = req.body;
+  app.post("/create-store", async (req, res) => {
+    const { userId, content } = req.body;
 
-    console.log("question", question);
+    console.error("userId", userId);
+    // console.error("content", content);
 
-    const result = await ragChain.invoke({
-      chat_history: chatHistory,
-      input: question,
+    // TODO: store data in "stores" variable
+    const docs = await loadDocs();
+    const newDoc = new Document({
+      pageContent: content,
+      metadata: {
+        // ...metadata,
+      },
     });
 
-    console.error("Result", result);
+    docs.push(newDoc);
 
-    chatHistory.push(new HumanMessage(question));
-    chatHistory.push(new AIMessage(result.answer));
+    console.log("docs", typeof docs, docs);
 
-    res.status(200).json(result);
+    const vectorStore = await db.createVectorStore({
+      embeddings,
+      docs,
+    });
+
+    stores[userId] = vectorStore;
+
+    res.json({ ok: "store was created" });
   });
 
-  app.post("/test", async (req, res) => {
-    const { stream } = req.body;
-
-    if (stream === false) {
-      res.status(200).json(ragResponseMock);
-      return;
-    }
-
+  app.post("/chat", async (req, res) => {
     res.setHeader("Content-Type", "text/plain");
     res.setHeader("Transfer-Encoding", "chunked");
 
-    const { chat_history, input, context, answer } = ragResponseMock;
-    const chunkDelimeter = "\n\t\t\t\n";
-
-    res.write(JSON.stringify({ history: chat_history }) + chunkDelimeter);
-    res.write(JSON.stringify({ input }) + chunkDelimeter);
-    res.write(JSON.stringify({ context }) + chunkDelimeter);
-
-    const answerArr = answer.split(" ");
-
-    for (const word of answerArr) {
-      res.write(JSON.stringify({ answer: word }) + chunkDelimeter);
-    }
-
-    res.end();
-  });
-
-  app.post("/chat-with-stream", async (req, res) => {
-    res.setHeader("Content-Type", "text/plain");
-    res.setHeader("Transfer-Encoding", "chunked");
-
-    const { question } = req.body;
+    const { question, userId } = req.body;
 
     try {
+      console.log("userId:", userId);
       console.log("question:", question);
 
       const answerData = [];
+
+      // NOTE: get user personal vectore store...
+
+      console.error("stores", stores);
+
+      // const vectorStore = stores[userId] || mainVectorStore;
+      // TODO: replace it
+      const vectorStore = stores["foo"];
+      const ragChain = await getRagChain(vectorStore);
       const stream = await ragChain.stream({
         input: question,
         chat_history: chat_history,
@@ -84,8 +84,6 @@ const initApp = (ragChain) => {
       const chunkDelimeter = "\n\t\t\t\n";
 
       for await (const chunk of stream) {
-        console.log("chunk", chunk);
-
         res.write(JSON.stringify(chunk) + chunkDelimeter);
 
         if (chunk.answer) {

@@ -2,8 +2,7 @@ import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createHistoryAwareRetriever } from "langchain/chains/history_aware_retriever";
 import { createRetrievalChain } from "langchain/chains/retrieval";
 import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold";
-import { db } from "../db/index.js";
-import { llm, embeddings } from "../llm/index.js";
+import { llm } from "../llm/index.js";
 
 import {
   ChatPromptTemplate,
@@ -50,15 +49,7 @@ const questionAnswerChain = await createStuffDocumentsChain({
   prompt: qaPrompt,
 });
 
-// TODO: add chat history <https://js.langchain.com/v0.2/docs/how_to/message_history/>
-const getRagChain = async () => {
-  // TODO: get this from env variables
-  const collectionName = "test-collection";
-  const vectorStore = await db.getVectorStore({
-    embeddings,
-    collectionName,
-  });
-
+const getRagChain = async (vectorStore) => {
   const retriever = ScoreThresholdRetriever.fromVectorStore(vectorStore, {
     minSimilarityScore: 0.3, // Finds results with at least this similarity score
     maxK: 7, // The maximum K value to use. Use it based to your chunk size to make sure you don't run out of tokens
@@ -79,7 +70,7 @@ const getRagChain = async () => {
     combineDocsChain: questionAnswerChain,
   });
 
-  return { ragChain, retriever };
+  return ragChain;
 };
 
 export default getRagChain;

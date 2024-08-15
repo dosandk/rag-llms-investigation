@@ -1,12 +1,25 @@
 import express from "express";
 import cors from "cors";
+import session from "express-session";
 
 import { testRouter } from "./routes/test.js";
 import { ragRouter } from "./routes/rag.js";
+import { uploadRouter } from "./routes/upload.js";
+import userSession from "./routes/user-session.js";
 
 const app = express();
 
 app.set("trust proxy", true);
+app.use(
+  session({
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      maxAge: 1000 * 60 * 15, // would expire after 15 minutes
+    },
+    secret: "<my_super_secret>",
+  }),
+);
 app.use(
   cors({
     origin: true,
@@ -15,8 +28,10 @@ app.use(
 );
 app.use(express.json());
 
+app.use(userSession);
 app.use("/api", testRouter);
 app.use("/api", ragRouter);
+app.use("/api", uploadRouter);
 
 app.all("*", async () => {
   throw new Error("Not found");
