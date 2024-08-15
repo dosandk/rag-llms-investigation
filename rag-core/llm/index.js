@@ -13,7 +13,7 @@ export const llm = new ChatOllama({
 });
 
 export const embeddings = new OllamaEmbeddings({
-  model: "llama3",
+  model: "llama3.1",
   // TODO: set baseUrl via env variable
   baseUrl: "http://localhost:11434",
 });

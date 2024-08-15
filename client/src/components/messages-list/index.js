@@ -67,9 +67,9 @@ export default class MessagesList extends BaseComponent {
 
     cursor.remove();
 
-    const content = messageBox.innerHTML;
+    const fullAnswer = responseDataAccumulated.answer.join("");
 
-    messageBox.innerHTML = this.transformTxtToMarkdown(content);
+    messageBox.innerHTML = this.transformTxtToMarkdown(fullAnswer);
 
     const sourcesList = this.renderQuestionSource(
       responseDataAccumulated.context,
@@ -92,6 +92,7 @@ export default class MessagesList extends BaseComponent {
   }
 
   transformTxtToMarkdown(text = "") {
+    console.log("text", text);
     return markdownRender(text);
   }
 

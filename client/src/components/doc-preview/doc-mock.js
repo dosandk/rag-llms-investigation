@@ -1,6 +1,10 @@
 export default `
 # Contributing Guide
 
+\`\`\`js
+const sum = (a, b) => a + b;
+\`\`\`
+
   > If you want to change something please use power of pull - request and issue tracker
 
 ## Table Of Contents
@@ -15,7 +19,7 @@ export default `
   1. Create a fork version of the matrix repo (click ** Fork ** button on the right side of the repo name's row).
 
 1. Clone the project forked:
-\`\`\`js
+\`\`\`bash
    git clone git @gitlab2.eleks-software.local: <firstname.lastname>/javascript-matrix.git
 \`\`\`
 1. Create branch:
