@@ -1,4 +1,5 @@
-import getRagChain from "../langchain/index.js";
+// import getRagChain from "../langchain/index.js";
+import getRagChain from "../langchain/agent.js";
 import start from "./src/app.js";
 
 try {

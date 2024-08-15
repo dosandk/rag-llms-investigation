@@ -39,6 +39,33 @@ const initApp = (ragChain) => {
     res.status(200).json(result);
   });
 
+  app.post("/test", async (req, res) => {
+    const { stream } = req.body;
+
+    if (stream === false) {
+      res.status(200).json(ragResponseMock);
+      return;
+    }
+
+    res.setHeader("Content-Type", "text/plain");
+    res.setHeader("Transfer-Encoding", "chunked");
+
+    const { chat_history, input, context, answer } = ragResponseMock;
+    const chunkDelimeter = "\n\t\t\t\n";
+
+    res.write(JSON.stringify({ history: chat_history }) + chunkDelimeter);
+    res.write(JSON.stringify({ input }) + chunkDelimeter);
+    res.write(JSON.stringify({ context }) + chunkDelimeter);
+
+    const answerArr = answer.split(" ");
+
+    for (const word of answerArr) {
+      res.write(JSON.stringify({ answer: word }) + chunkDelimeter);
+    }
+
+    res.end();
+  });
+
   app.post("/chat-with-stream", async (req, res) => {
     res.setHeader("Content-Type", "text/plain");
     res.setHeader("Transfer-Encoding", "chunked");

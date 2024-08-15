@@ -40,7 +40,8 @@ class Chat {
     });
 
     this.chatHistory.push(new HumanMessage(question));
-    this.chatHistory.push(new AIMessage(result.answer));
+    this.chatHistory.push(new AIMessage(result.output));
+    // this.chatHistory.push(new AIMessage(result.answer));
 
     return result;
   };
