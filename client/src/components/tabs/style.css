@@ -1,0 +1,42 @@
+.tabs-buttons {
+  /* padding-bottom: 0.6rem; */
+  border-bottom: 1px solid #d5d5d5;
+}
+
+.tabs-buttons .nav-item {
+  margin-right: 0.6rem;
+}
+
+.tabs-buttons .nav-link {
+  padding: 6px 12px;
+}
+
+.nav-pills.tabs-buttons .nav-link.active,
+.nav-pills.tabs-buttons .show>.nav-link {
+  position: relative;
+  font-weight: bold;
+  color: #2d2d44;
+  background-color: #f2f2f2;
+  filter: brightness(102%);
+}
+
+.nav-pills.tabs-buttons .nav-link.active::after,
+.nav-pills.tabs-buttons .show>.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.1rem;
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: #3d7929;
+}
+
+.tabs-buttons .nav-link {
+  color: #2d2d44;
+}
+
+.tabs-buttons .nav-link:hover {
+  color: #2d2d44;
+  background-color: #f2f2f2;
+}

@@ -10,6 +10,6 @@ export default class Footer extends BaseComponent {
   }
 
   get template() {
-    return <div class="app-footer">some footer here...</div>;
+    return <div class="app-footer"></div>;
   }
 }

@@ -31,7 +31,6 @@ const initApp = (mainVectorStore) => {
     const { userId, content } = req.body;
 
     console.error("userId", userId);
-    // console.error("content", content);
 
     // TODO: store data in "stores" variable
     const docs = await loadDocs();
@@ -69,12 +68,9 @@ const initApp = (mainVectorStore) => {
       const answerData = [];
 
       // NOTE: get user personal vectore store...
-
-      console.error("stores", stores);
-
-      // const vectorStore = stores[userId] || mainVectorStore;
+      const vectorStore = stores[userId] || mainVectorStore;
       // TODO: replace it
-      const vectorStore = stores["foo"];
+      // const vectorStore = stores["foo"];
       const ragChain = await getRagChain(vectorStore);
       const stream = await ragChain.stream({
         input: question,

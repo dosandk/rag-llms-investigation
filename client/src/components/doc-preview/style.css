@@ -1,0 +1,54 @@
+.doc-content {
+  background: white;
+  height: 100%;
+}
+
+.app-panel-controls {
+  top: 0;
+  z-index: 1;
+  height: 42px;
+  min-height: 42px;
+}
+
+.app-panel-tabs {
+  height: 100%;
+}
+
+.app-tab:first-child {
+  border-left-width: 0;
+}
+
+.app-tab:last-child:not(.active) {
+  border-right-width: 1px;
+  border-right-style: solid;
+  cursor: pointer;
+}
+
+.app-tab {
+  height: 100%;
+  min-width: 100px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-color: #d5d5d5;
+  transition: background 0.3s;
+  color: #555;
+}
+
+.app-tab i {
+  color: darkblue;
+}
+
+.app-tab:hover {
+  background: white;
+  cursor: default;
+}
+
+.app-tab.active {
+  background: white;
+  font-weight: bold;
+  color: #2d2d44;
+}

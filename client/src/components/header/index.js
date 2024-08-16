@@ -10,6 +10,6 @@ export default class Header extends BaseComponent {
   }
 
   get template() {
-    return <div class="app-header">some header here...</div>;
+    return <div class="app-header"></div>;
   }
 }
