@@ -4,8 +4,12 @@ import AppAccordion from "../accordion/index.js";
 
 import "./style.css";
 
+const MAX_HISTORY_LENGTH = 3;
+
 /** @jsx globalThis[Symbol.for("createElement")] */
 export default class MessagesList extends BaseComponent {
+  chat_history = [];
+
   constructor(dataProvider) {
     super();
     this.init();
@@ -39,6 +43,7 @@ export default class MessagesList extends BaseComponent {
 
     const result = await this.dataProvider(
       question,
+      this.chat_history,
       ({ json, count, done } = {}) => {
         if (responseDataAccumulated.answer.length === 0 && json.answer) {
           this.resetAiMessagePlaceholder();
@@ -57,7 +62,6 @@ export default class MessagesList extends BaseComponent {
         this.scrollElementDown(messageBox);
       },
     );
-
     if (result.error) {
       if (!responseDataAccumulated.answer.length) {
         this.resetAiMessagePlaceholder("request was cancelled");
@@ -77,6 +81,12 @@ export default class MessagesList extends BaseComponent {
     messageBox.append(sourcesList);
 
     this.scrollElementDown(messageBox);
+
+    // Add messages to Chat History
+    this.chat_history.push(question);
+    this.chat_history.push(fullAnswer);
+    // Trim history to have MAX_HISTORY_LENGTH of last message pairs
+    this.chat_history = this.chat_history.slice(-1 * MAX_HISTORY_LENGTH * 2);
   }
 
   renderQuestionSource(sources = []) {

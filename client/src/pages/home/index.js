@@ -103,7 +103,7 @@ export default class HomePage extends BaseComponent {
     element.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
-  async getResponse(question = "") {
+  async getResponse(question = "", chat_history = []) {
     try {
       const response = await fetch(this.RAG_URL, {
         method: "POST",
@@ -113,6 +113,7 @@ export default class HomePage extends BaseComponent {
         credentials: "include",
         body: JSON.stringify({
           question,
+          chat_history
         }),
         signal: this.abortController.signal,
       });
@@ -152,9 +153,9 @@ export default class HomePage extends BaseComponent {
     await read(reader, decoder, callback, 0);
   }
 
-  getData = async (question = "", callback) => {
+  getData = async (question = "", chat_history = [], callback) => {
     try {
-      const response = await this.getResponse(question);
+      const response = await this.getResponse(question, chat_history);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 

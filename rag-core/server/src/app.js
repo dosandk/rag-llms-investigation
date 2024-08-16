@@ -8,8 +8,6 @@ import { loadDocs } from "../../utils/load-docs.js";
 import { embeddings } from "../../llm/index.js";
 import { Document } from "@langchain/core/documents";
 
-const chat_history = [];
-
 const initApp = (mainVectorStore) => {
   const app = express();
 
@@ -59,7 +57,12 @@ const initApp = (mainVectorStore) => {
     res.setHeader("Content-Type", "text/plain");
     res.setHeader("Transfer-Encoding", "chunked");
 
-    const { question, userId } = req.body;
+    const { question, chat_history, userId } = req.body;
+
+    // We need to convert chat history to LangChain HumanMessage and AIMessage objects
+    const langChain_chat_history = chat_history.map((item, index) =>
+      index % 2 === 0 ? new AIMessage(item) : new HumanMessage(item),
+    );
 
     try {
       console.log("userId:", userId);
@@ -68,13 +71,13 @@ const initApp = (mainVectorStore) => {
       const answerData = [];
 
       // NOTE: get user personal vectore store...
+      console.error("stores", stores);
+
       const vectorStore = stores[userId] || mainVectorStore;
-      // TODO: replace it
-      // const vectorStore = stores["foo"];
       const ragChain = await getRagChain(vectorStore);
       const stream = await ragChain.stream({
         input: question,
-        chat_history: chat_history,
+        chat_history: langChain_chat_history,
       });
 
       const chunkDelimeter = "\n\t\t\t\n";
@@ -87,9 +90,6 @@ const initApp = (mainVectorStore) => {
         }
       }
 
-      // TODO: make chat histoy stateless and keep it only inside requests...
-      chat_history.push(new HumanMessage(question));
-      chat_history.push(new AIMessage(answerData.join("")));
       res.end();
     } catch (error) {
       console.error(error);

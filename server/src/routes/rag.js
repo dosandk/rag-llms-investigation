@@ -10,7 +10,7 @@ if (!RAG_CORE_URL) {
 
 router.post("/rag", async (req, res) => {
   try {
-    const { question } = req.body;
+    const { question, chat_history } = req.body;
     const { userId } = req.session;
 
     console.error("userId", userId);
@@ -22,6 +22,7 @@ router.post("/rag", async (req, res) => {
       },
       body: JSON.stringify({
         question,
+        chat_history,
         userId,
       }),
     });
