@@ -8,13 +8,13 @@ import {
 } from "@langchain/textsplitters";
 
 // TODO: change to Lama embedings
-import { db } from "../db/index.js";
-import { embeddings } from "../llm/index.js";
+import { db } from "../src/db/index.js";
+import { embeddings } from "../src/llm/index.js";
 
 import { UnstructuredDirectoryLoader } from "@langchain/community/document_loaders/fs/unstructured";
 
 const getDocsContent = async () => {
-  const DATA_DIR = join(import.meta.dirname, "../docs");
+  const DATA_DIR = join(import.meta.dirname, "../src/docs");
   const docs = [];
 
   try {
