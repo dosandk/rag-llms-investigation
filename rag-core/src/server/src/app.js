@@ -26,31 +26,27 @@ const initApp = (mainVectorStore) => {
   };
 
   app.post("/create-store", async (req, res) => {
-    const { userId, content } = req.body;
+    const { userId, content: { file, metadata } } = req.body;
 
-    console.error("userId", userId);
-
-    // TODO: store data in "stores" variable
-    const docs = await loadDocs();
-    const newDoc = new Document({
-      pageContent: content,
-      metadata: {
-        // ...metadata,
-      },
+    const doc = new Document({
+      pageContent: file,
+      metadata
     });
 
-    docs.push(newDoc);
+    try {
+      const docs = await loadDocs();
+      docs.push(doc);
 
-    console.log("docs", typeof docs, docs);
+      const vectorStore = await db.createVectorStore({
+        embeddings,
+        docs,
+      });
+      stores[userId] = vectorStore;
 
-    const vectorStore = await db.createVectorStore({
-      embeddings,
-      docs,
-    });
-
-    stores[userId] = vectorStore;
-
-    res.json({ ok: "store was created" });
+      res.json({ ok: "store was created" });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
   });
 
   app.post("/chat", async (req, res) => {
@@ -98,7 +94,7 @@ const initApp = (mainVectorStore) => {
     }
   });
 
-  app.all("*", async () => {
+  app.all("*", async (req, res) => {
     throw new Error("Not found");
   });
 
