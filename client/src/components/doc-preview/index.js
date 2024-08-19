@@ -42,8 +42,6 @@ export default class DocPreview extends BaseComponent {
 
   renderTabs() {
     this.element.append(this.components.tracksTabs.element);
-
-    console.error(this.components.tracksTabs.element);
   }
 
   get template() {
