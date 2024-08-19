@@ -37,4 +37,8 @@ app.all("*", async () => {
   throw new Error("Not found");
 });
 
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).send({ message: err.message })
+});
+
 export default app;
