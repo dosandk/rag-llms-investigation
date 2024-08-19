@@ -7,10 +7,6 @@ const SESSION_DURATION = 1 * 60 * 1000; // 1min
 const userSession = (req, res, next) => {
   const { userId, createdAt } = req.session;
 
-  console.error("session", req.session);
-  console.error("userId", req.session.userId);
-  console.error("createdAt", req.session.createdAt);
-
   if (userId) {
     console.error("session exists");
     // if (Date.now - createdAt > SESSION_DURATION) {

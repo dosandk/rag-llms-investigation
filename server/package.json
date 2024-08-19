@@ -5,8 +5,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config ./index.js",
-    "dev": "nodemon ./index.js"
+    "start": "cross-env NODE_ENV=production node -r dotenv/config ./index.js",
+    "dev": "cross-env NODE_ENV=development nodemon -r dotenv/config ./index.js",
+    "remove": "rimraf ./build",
+    "build": "npm run remove && mkdir -p build/src && cp -r ./index.js ./package.json ./package-lock.json ./.env ./src ./build",
+    "deploy": "rsync -vzrl --no-perms --no-owner --no-group --delete build/ root@online-editor-client:/var/www/ai.bootcamp.place/server/"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +19,9 @@
     "express-session": "^1.18.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "rimraf": "^6.0.1"
   }
 }

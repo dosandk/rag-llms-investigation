@@ -7,10 +7,11 @@
   "scripts": {
     "parse-docs": "node -r dotenv/config ./docs-parser/index.js",
     "remove-db": "rimraf ./chroma-data ./chroma.log",
-    "start": "nodemon -r dotenv/config ./server/index.js",
+    "build": "rimraf ./build && mkdir -p build && cp -r ./package.json ./package-lock.json ./.env ./src ./build",
+    "start": "cross-env NODE_ENV=production node -r dotenv/config ./src/server/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon -r dotenv/config ./src/server/index.js",
     "start:cli": "nodemon -r dotenv/config --inspect ./cli/index.js",
-    "start:server": "nodemon -r dotenv/config --inspect ./server/index.js",
-    "deploy": ""
+    "deploy": "rsync -vzrl --no-perms --no-owner --no-group --delete build/ root@rag:/var/www/ai.bootcamp.place/rag-core/"
   },
   "author": "",
   "license": "ISC",
@@ -30,6 +31,7 @@
     "unstructured-client": "^0.14.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.4",
     "rimraf": "^6.0.1"
   }

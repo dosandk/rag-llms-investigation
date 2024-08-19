@@ -1,5 +1,4 @@
 import { join } from "node:path";
-import { readdir, readFile } from "node:fs/promises";
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { CustomMDLoader } from "./custom-md-loader.js";
 

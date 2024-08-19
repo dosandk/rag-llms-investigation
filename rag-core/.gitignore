@@ -4,3 +4,4 @@ chroma.log
 /data/
 /chroma-data/
 .env
+/build/

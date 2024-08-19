@@ -1,5 +1,4 @@
 import initApp from "./src/app.js";
-import getRagChain from "../langchain/index.js";
 import { embeddings } from "../llm/index.js";
 import { loadDocs } from "../utils/load-docs.js";
 import { db } from "../db/memory-db.js";
