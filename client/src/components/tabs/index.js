@@ -135,8 +135,6 @@ export class Tabs extends BaseComponent {
           ...defaultComponentArguments,
         );
 
-        console.error(this.activeTabComponent);
-
         tabContainerElement.append(this.activeTabComponent.element);
       });
     }

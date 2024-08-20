@@ -1,12 +1,8 @@
 import express from "express";
 import { Readable, pipeline } from "node:stream";
+import { chat } from "../api/index.js";
 
 const router = express.Router();
-const RAG_CORE_URL = process.env.RAG_CORE_URL;
-
-if (!RAG_CORE_URL) {
-  throw new Error("RAG_CORE_URL must be defined");
-}
 
 router.post("/rag", async (req, res) => {
   try {
@@ -15,31 +11,26 @@ router.post("/rag", async (req, res) => {
 
     console.error("userId", userId);
 
-    const response = await fetch(RAG_CORE_URL + "/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        question,
-        chat_history,
-        userId,
-      }),
-    });
+    const [error, response] = await chat(question, chat_history, userId);
 
-    // TODO: keep it for testing error handling on client side
-    // Readable.fromWeb(response.body).pipe(res);
-    // pipeline(response.body, res);
-    pipeline(Readable.fromWeb(response.body), res, (error) => {
-      if (error) {
-        console.error("Pipeline failed.", error);
-      } else {
-        console.log("Pipeline succeeded.");
-      }
-    });
+    if (error) {
+      return res.status(500).json({ error });
+    }
+
+    pipeline(
+      Readable.fromWeb(response.body, { highWaterMark: 10, objectMode: true }),
+      res,
+      (error) => {
+        if (error) {
+          console.error("Pipeline failed.", error);
+        } else {
+          console.log("Pipeline succeeded.");
+        }
+      },
+    );
   } catch (error) {
     console.error(error);
-    res.status(400).json({ error });
+    res.status(400).json({ error: error.message });
   }
 });
 

@@ -4,9 +4,11 @@ import cors from "cors";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { db } from "../../db/memory-db.js";
 import getRagChain from "../../langchain/index.js";
-import { loadDocs } from "../../utils/load-docs.js";
+// NOTE: uncomment if you want to merge default doc with user doc
+// import { loadDocs } from "../../utils/load-docs.js";
 import { embeddings } from "../../llm/index.js";
 import { Document } from "@langchain/core/documents";
+import StoresService from "../../services/stores-service.js";
 
 const initApp = (mainVectorStore) => {
   const app = express();
@@ -20,31 +22,47 @@ const initApp = (mainVectorStore) => {
   );
   app.use(express.json());
 
-  // TODO: implement service for stores clearing
-  const stores = {
-    // userId: { expDate: "", vectoreStore: {} }
-  };
+  const storesService = new StoresService();
+
+  app.post("/remove-store", async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+      storesService.removeStore(userId);
+      res.json({ ok: "store was removed" });
+    } catch (error) {
+      console.error(error);
+      res.status(400).send({ error: error.message });
+    }
+  });
 
   app.post("/create-store", async (req, res) => {
-    const { userId, content: { file, metadata } } = req.body;
+    const {
+      userId,
+      createdAt,
+      content: { file, metadata },
+    } = req.body;
 
     const doc = new Document({
       pageContent: file,
-      metadata
+      metadata,
     });
 
     try {
-      const docs = await loadDocs();
-      docs.push(doc);
+      // NOTE: you can merge content with default document
+      // const docs = await loadDocs();
+      // docs.push(doc);
 
       const vectorStore = await db.createVectorStore({
         embeddings,
-        docs,
+        docs: [doc],
       });
-      stores[userId] = vectorStore;
 
-      res.json({ ok: "store was created" });
+      storesService.addStore(userId, createdAt, vectorStore);
+
+      res.json({ status: "store was created" });
     } catch (error) {
+      console.error(error);
       res.status(400).send({ error: error.message });
     }
   });
@@ -67,9 +85,16 @@ const initApp = (mainVectorStore) => {
       const answerData = [];
 
       // NOTE: get user personal vectore store...
-      console.error("stores", stores);
+      console.error("stores", storesService.size);
 
-      const vectorStore = stores[userId] || mainVectorStore;
+      // NOTE: just for debug
+      if (storesService.getStore(userId)) {
+        console.error(`store for ${userId} exists!`);
+      } else {
+        console.error("default store will be used");
+      }
+
+      const vectorStore = storesService.getStore(userId) || mainVectorStore;
       const ragChain = await getRagChain(vectorStore);
       const stream = await ragChain.stream({
         input: question,
@@ -89,8 +114,7 @@ const initApp = (mainVectorStore) => {
       res.end();
     } catch (error) {
       console.error(error);
-      res.status(400).json({ error });
-      res.end();
+      res.status(400).json({ error: error.message });
     }
   });
 

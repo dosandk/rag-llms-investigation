@@ -5,7 +5,7 @@ import session from "express-session";
 import { testRouter } from "./routes/test.js";
 import { ragRouter } from "./routes/rag.js";
 import { uploadRouter } from "./routes/upload.js";
-import userSession from "./routes/user-session.js";
+import userSession from "./middlewares/user-session.js";
 
 const app = express();
 
@@ -38,7 +38,7 @@ app.all("*", async () => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).send({ message: err.message })
+  res.status(err.statusCode || 500).send({ message: err.message });
 });
 
 export default app;

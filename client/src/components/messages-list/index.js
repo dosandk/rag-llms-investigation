@@ -62,6 +62,7 @@ export default class MessagesList extends BaseComponent {
         this.scrollElementDown(messageBox);
       },
     );
+
     if (result.error) {
       if (!responseDataAccumulated.answer.length) {
         this.resetAiMessagePlaceholder("request was cancelled");
@@ -78,14 +79,15 @@ export default class MessagesList extends BaseComponent {
     const sourcesList = this.renderQuestionSource(
       responseDataAccumulated.context,
     );
+
     messageBox.append(sourcesList);
 
     this.scrollElementDown(messageBox);
 
-    // Add messages to Chat History
+    // NOTE: Add messages to Chat History
     this.chat_history.push(question);
     this.chat_history.push(fullAnswer);
-    // Trim history to have MAX_HISTORY_LENGTH of last message pairs
+    // NOTE: Trim history to have MAX_HISTORY_LENGTH of last message pairs
     this.chat_history = this.chat_history.slice(-1 * MAX_HISTORY_LENGTH * 2);
   }
 
@@ -102,7 +104,6 @@ export default class MessagesList extends BaseComponent {
   }
 
   transformTxtToMarkdown(text = "") {
-    console.log("text", text);
     return markdownRender(text);
   }
 
