@@ -1,4 +1,5 @@
 import express from "express";
+import compression from "compression";
 import cors from "cors";
 
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
@@ -13,6 +14,7 @@ import StoresService from "../../services/stores-service.js";
 const initApp = (mainVectorStore) => {
   const app = express();
 
+  app.use(compression());
   app.set("trust proxy", true);
   app.use(
     cors({

@@ -10,7 +10,8 @@ router.post("/remove-store", async (req, res) => {
   const [error, json] = result;
 
   if (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: "error during store removing" });
   }
 
   console.error(json);

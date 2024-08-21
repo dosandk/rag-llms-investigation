@@ -25,7 +25,8 @@ const userSession = async (req, res, next) => {
       req.session.createdAt = Date.now();
 
       if (error) {
-        return next({ error });
+        console.error(error);
+        return next({ error: "error during store removing" });
       }
 
       console.log("session was removed", json);

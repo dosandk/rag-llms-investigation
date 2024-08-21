@@ -14,7 +14,7 @@ router.post("/rag", async (req, res) => {
     const [error, response] = await chat(question, chat_history, userId);
 
     if (error) {
-      return res.status(500).json({ error });
+      return res.status(500).json({ error: "can't get access to 'rag-core'" });
     }
 
     pipeline(

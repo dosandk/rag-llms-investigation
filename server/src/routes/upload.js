@@ -11,7 +11,9 @@ router.post("/upload", uploadFile, async (req, res) => {
   const [error, json] = result;
 
   if (error) {
-    return res.status(500).json({ error });
+    console.error(error);
+
+    return res.status(500).json({ error: "error during store creation" });
   }
 
   res.json({ json });
