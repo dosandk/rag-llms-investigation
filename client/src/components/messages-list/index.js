@@ -65,7 +65,7 @@ export default class MessagesList extends BaseComponent {
 
     if (result.error) {
       if (!responseDataAccumulated.answer.length) {
-        this.resetAiMessagePlaceholder("request was cancelled");
+        this.resetAiMessagePlaceholder(result.error);
         return;
       }
     }

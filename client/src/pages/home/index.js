@@ -156,6 +156,18 @@ export default class HomePage extends BaseComponent {
   getData = async (question = "", chat_history = [], callback) => {
     try {
       const response = await this.getResponse(question, chat_history);
+
+      if (!response.ok) {
+        try {
+          const body = await response.json();
+          const { error } = body;
+
+          return { error };
+        } catch (error) {
+          return { error: "something went wrong" };
+        }
+      }
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -163,8 +175,7 @@ export default class HomePage extends BaseComponent {
 
       return { error: false };
     } catch (error) {
-      console.error(error);
-      return { error: true };
+      return { error: error.message };
     }
   };
 

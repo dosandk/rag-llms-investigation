@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
+import rateLimit from "express-rate-limit";
 
 import { testRouter } from "./routes/test.js";
 import { storeRouter } from "./routes/store.js";
@@ -19,12 +20,29 @@ app.use(
     secure: process.env.NODE_ENV === "production",
   }),
 );
+
 app.use(
   cors({
-    origin: true,
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://ai.bootcamp.place"
+        : true,
     credentials: true,
   }),
 );
+
+const WINDOW_MS = 15 * 60 * 1000; // 15 mins
+
+app.use(
+  rateLimit({
+    windowMs: WINDOW_MS,
+    max: 20, // max calls from one IP address
+    message: {
+      error: `Too many requests, please try again after ${WINDOW_MS / (60 * 1000)} mins`,
+    },
+  }),
+);
+
 app.use(express.json());
 
 app.use(userSession);
