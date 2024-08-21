@@ -113,7 +113,7 @@ export default class HomePage extends BaseComponent {
         credentials: "include",
         body: JSON.stringify({
           question,
-          chat_history
+          chat_history,
         }),
         signal: this.abortController.signal,
       });
@@ -182,8 +182,8 @@ export default class HomePage extends BaseComponent {
             <div class="chat">
               <div class="chat-messages-list">
                 <h3 class="text-center welcome-message">
-                  <span class="ollama-logo"></span>
-                  <span>Hello, I'm Ollam3. How can I help you today?</span>
+                  {/* <span class="ollama-logo"></span> */}
+                  <span>Hello, how can I help you today?</span>
                 </h3>
                 {messagesList.element}
               </div>

@@ -28,8 +28,6 @@ export default class StoresService {
   removeStore(userId = "") {
     this.#storesList.delete(userId);
 
-    console.error("remove store", userId, this.#storesList.size);
-
     return this.#storesList;
   }
 
@@ -42,7 +40,9 @@ export default class StoresService {
           for (const [userId, value] of this.#storesList) {
             const { createdAt } = value;
 
-            if (Date.now() - createdAt > this.SESSION_DURATION) {
+            const timeDiff = Date.now() - createdAt;
+
+            if (timeDiff > this.SESSION_DURATION) {
               this.removeStore(userId);
             }
           }

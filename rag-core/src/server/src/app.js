@@ -43,6 +43,7 @@ const initApp = (mainVectorStore) => {
       content: { file, metadata },
     } = req.body;
 
+    // TODO: make transformatios for ".md" or other formats
     const doc = new Document({
       pageContent: file,
       metadata,

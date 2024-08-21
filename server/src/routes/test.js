@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { readFile } from "fs/promises";
 import express from "express";
 import ragResponseMock from "../rag-response-mock.js";
+import { removeStore } from "../api/index.js";
 
 const router = express.Router();
 
@@ -10,39 +11,6 @@ const wait = async (duration = 0) => {
     setTimeout(() => resolve(), duration);
   });
 };
-
-const RAG_CORE_URL = process.env.RAG_CORE_URL;
-
-if (!RAG_CORE_URL) {
-  throw new Error("RAG_CORE_URL must be defined");
-}
-
-router.post("/create-store", async (req, res) => {
-  const { userId } = req.session;
-  const filePath = join(import.meta.dirname, "./test-doc.md");
-  const fileContent = await readFile(filePath, "utf8");
-
-  console.error("fileContent", fileContent);
-  console.error("userId", userId);
-
-  const response = await fetch(RAG_CORE_URL + "/create-store", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      content: fileContent,
-      // TODO: replace it
-      userId: "foo",
-    }),
-  });
-
-  const json = await response.json();
-
-  console.log("json", json);
-
-  res.json({ ok: "ok" });
-});
 
 router.post("/test", async (req, res) => {
   // await wait(3000);

@@ -11,12 +11,18 @@ const userSession = async (req, res, next) => {
 
   if (userId) {
     console.error("session exists");
+    const timeDiff = Date.now() - createdAt;
 
-    if (Date.now() - createdAt > SESSION_DURATION) {
+    console.error("timeDiff", timeDiff);
+
+    if (timeDiff > SESSION_DURATION) {
       console.error("but session expired");
 
       const result = await removeStore(userId, createdAt);
       const [error, json] = result;
+
+      req.session.userId = getUniqId();
+      req.session.createdAt = Date.now();
 
       if (error) {
         return next({ error });
