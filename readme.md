@@ -20,10 +20,10 @@
 ## TODOs:
 
 - [x] add memory for LLM
-- add chat history
-- add auth (needed for chat history)
-- add some agent to our implementation
-- add tests
-- deploy LLM
-- find GUI for chat LLM
-- investigate available vector DBs
+- [] add chat history
+- [] add auth (needed for chat history)
+- [] add some agent to our implementation
+- [] add tests
+- [x] deploy LLM
+- [] find GUI for chat LLM
+- [] investigate available vector DBs
