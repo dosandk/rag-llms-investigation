@@ -43,6 +43,7 @@ app.use(
   }),
 );
 
+app.disable("x-powered-by");
 app.use(express.json());
 
 app.use(userSession);
