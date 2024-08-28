@@ -15,4 +15,4 @@ import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 // });
 
 export const embeddings = new OpenAIEmbeddings();
-export const llm = new ChatOpenAI({ model: "gpt-3.5-turbo", temperature: 0 });
+export const llm = new ChatOpenAI({ model: "gpt-3.5-turbo", temperature: 0.4 });
