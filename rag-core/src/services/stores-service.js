@@ -1,32 +1,57 @@
-export default class StoresService {
-  #storesList = new Map();
+import { db } from "../db/pinecone-db.js";
+// import { db } from "../db/memory-db.js";
+import { Document } from "@langchain/core/documents";
+
+class StoresService {
   SESSION_DURATION = 15 * 60 * 1000; // 15 mins
   SCHEDULER_TIMEOUT = 1 * 60 * 1000; // 1 mins
 
-  constructor() {
-    this.runSheduler();
-  }
+  #storesList = new Map();
 
-  get storesList() {
-    return this.#storesList;
+  constructor(db) {
+    this.db = db;
+    this.runSheduler();
   }
 
   get size() {
     return this.#storesList.size;
   }
 
-  getStore(userId = "") {
+  getUserStore(userId = "") {
     return this.#storesList.get(userId)?.store;
   }
 
-  addStore(userId = "", createdAt = "", store = {}) {
-    this.#storesList.set(userId, { createdAt, store });
+  async createOrGetMainStore() {
+    try {
+      const store = await this.db.createOrGetMainStore();
 
-    return this.#storesList;
+      return store;
+    } catch (error) {
+      console.error("Can't get store", error);
+      throw new Error(error);
+    }
   }
 
-  removeStore(userId = "") {
+  async createUserStore(userId, createdAt, content) {
+    const { file, metadata } = content;
+
+    const doc = new Document({
+      pageContent: file,
+      metadata,
+    });
+
+    const store = await this.db.createUserStore({ userId, doc });
+
+    this.#storesList.set(userId, {
+      store,
+      createdAt,
+    });
+  }
+
+  async removeUserStore(userId = "") {
     this.#storesList.delete(userId);
+
+    await this.db.remove(userId);
 
     return this.#storesList;
   }
@@ -43,7 +68,7 @@ export default class StoresService {
             const timeDiff = Date.now() - createdAt;
 
             if (timeDiff > this.SESSION_DURATION) {
-              this.removeStore(userId);
+              this.removeUserStore(userId);
             }
           }
         }
@@ -51,11 +76,9 @@ export default class StoresService {
         step();
       }, this.SCHEDULER_TIMEOUT);
     };
-
-    step();
-  }
-
-  clearAll() {
-    this.#storesList = new Map();
   }
 }
+
+const storesService = new StoresService(db);
+
+export default storesService;

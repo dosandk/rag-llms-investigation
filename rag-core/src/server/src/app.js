@@ -3,19 +3,14 @@ import compression from "compression";
 import cors from "cors";
 
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import { db } from "../../db/memory-db.js";
 import getRagChain from "../../langchain/index.js";
-// NOTE: uncomment if you want to merge default doc with user doc
-// import { loadDocs } from "../../utils/load-docs.js";
-import { embeddings } from "../../llm/index.js";
-import { Document } from "@langchain/core/documents";
-import StoresService from "../../services/stores-service.js";
+import storesService from "../../services/stores-service.js";
 
 const initApp = (mainVectorStore) => {
   const app = express();
 
   app.use(compression());
-  app.set("trust proxy", true);
+  app.set("trust proxy", 1);
   app.use(
     cors({
       origin: true,
@@ -24,13 +19,11 @@ const initApp = (mainVectorStore) => {
   );
   app.use(express.json());
 
-  const storesService = new StoresService();
-
   app.post("/remove-store", async (req, res) => {
     const { userId } = req.body;
 
     try {
-      storesService.removeStore(userId);
+      await storesService.removeUserStore(userId);
       res.json({ ok: "store was removed" });
     } catch (error) {
       console.error(error);
@@ -44,24 +37,11 @@ const initApp = (mainVectorStore) => {
       createdAt,
       content: { file, metadata },
     } = req.body;
-
-    // TODO: make transformatios for ".md" or other formats
-    const doc = new Document({
-      pageContent: file,
-      metadata,
-    });
-
     try {
-      // NOTE: you can merge content with default document
-      // const docs = await loadDocs();
-      // docs.push(doc);
-
-      const vectorStore = await db.createVectorStore({
-        embeddings,
-        docs: [doc],
+      await storesService.createUserStore(userId, createdAt, {
+        file,
+        metadata,
       });
-
-      storesService.addStore(userId, createdAt, vectorStore);
 
       res.json({ status: "store was created" });
     } catch (error) {
@@ -88,16 +68,16 @@ const initApp = (mainVectorStore) => {
       const answerData = [];
 
       // NOTE: get user personal vectore store...
-      console.error("stores", storesService.size);
+      console.error("stores size", storesService.size);
 
       // NOTE: just for debug
-      if (storesService.getStore(userId)) {
+      if (storesService.getUserStore(userId)) {
         console.error(`store for ${userId} exists!`);
       } else {
         console.error("default store will be used");
       }
 
-      const vectorStore = storesService.getStore(userId) || mainVectorStore;
+      const vectorStore = storesService.getUserStore(userId) || mainVectorStore;
       const ragChain = await getRagChain(vectorStore);
       const stream = await ragChain.stream({
         input: question,

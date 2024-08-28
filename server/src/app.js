@@ -11,7 +11,7 @@ import userSession from "./middlewares/user-session.js";
 
 const app = express();
 
-app.set("trust proxy", true);
+app.set("trust proxy", 2);
 
 app.use(
   cookieSession({

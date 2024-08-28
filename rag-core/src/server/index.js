@@ -1,7 +1,5 @@
 import initApp from "./src/app.js";
-import { embeddings } from "../llm/index.js";
-import { loadDocs } from "../utils/load-docs.js";
-import { db } from "../db/memory-db.js";
+import storesService from "../services/stores-service.js";
 
 const start = async () => {
   const PORT = process.env.PORT;
@@ -14,12 +12,7 @@ const start = async () => {
     console.error("unhandledRejection", error);
   });
 
-  const docs = await loadDocs();
-  const vectorStore = await db.createVectorStore({
-    embeddings,
-    docs,
-  });
-
+  const vectorStore = await storesService.createOrGetMainStore();
   const app = initApp(vectorStore);
 
   app.listen(PORT, () => {
@@ -28,7 +21,7 @@ const start = async () => {
 };
 
 try {
-  start();
+  await start();
 } catch (error) {
   console.log("Failed to start chat server", error.message);
 }
