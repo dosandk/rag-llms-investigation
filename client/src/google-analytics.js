@@ -1,4 +1,4 @@
-const { GOOGLE_ANALYTICS } = globalThis[Symbol.for("config")];
+const { GOOGLE_ANALYTICS } = globalThis[Symbol.for("app-config")];
 const gaLoader = document.createElement("script");
 
 gaLoader.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS}`;
