@@ -14,6 +14,7 @@ module.exports = {
   },
   entry: {
     config: path.join(__dirname, "../src/config.js"),
+    analytics: path.join(__dirname, "../src/google-analytics.js"),
     app: path.join(__dirname, "../src/index.js"),
   },
   output: {
@@ -43,6 +44,9 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       "process.env.BACKEND_URL": JSON.stringify(process.env.BACKEND_URL),
+      "process.env.GOOGLE_ANALYTICS": JSON.stringify(
+        process.env.GOOGLE_ANALYTICS,
+      ),
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "../src/index.html"),
