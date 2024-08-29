@@ -3,6 +3,7 @@ require("dotenv").config();
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const jsLoaders = require("./loaders/js-loaders");
 const cssLoaders = require("./loaders/css-loaders");
@@ -51,6 +52,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "../src/index.html"),
       favicon: path.join(__dirname, "../src/favicon.ico"),
+    }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: "[name].css",
+      chunkFilename: "[id].css",
     }),
   ],
 };
