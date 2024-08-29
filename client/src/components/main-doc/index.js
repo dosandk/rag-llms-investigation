@@ -1,7 +1,7 @@
 import BaseComponent from "../base.js";
 import markdownRender from "../../libs/markdown-render/index.js";
 
-import mdContent from "./main.md";
+import mdContent from "../../../main-doc.md";
 
 import "./style.css";
 

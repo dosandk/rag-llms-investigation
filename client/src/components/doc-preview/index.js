@@ -1,5 +1,4 @@
 import BaseComponent from "../base";
-import doc from "./doc-mock.js";
 import { Tabs } from "../tabs/index.js";
 import MainDoc from "../main-doc/index.js";
 import UserDoc from "../user-doc/index.js";
@@ -10,10 +9,6 @@ import "./style.css";
 export default class DocPreview extends BaseComponent {
   components = {};
   tabsSubElements = {};
-  tabsContent = {
-    "main.md": doc,
-    "your.md": "doo bar",
-  };
 
   tabsConfig = [
     {
