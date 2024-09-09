@@ -4,6 +4,10 @@
 - Create AI engeneer roadmap like, something like <https://roadmap.sh/prompt-engineering>
 - Find simple sertification for Copilot
 
+## Architecture
+
+![project architectire](./assets/ai-bootcamp-place.png)
+
 ## LLMs frameworks
 
 - <https://www.langchain.com/>
